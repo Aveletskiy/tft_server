@@ -1,3 +1,5 @@
+import { SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION } from "constants";
+
 let instance = null;
 
 export class TftApiService {
@@ -31,7 +33,6 @@ export class TftApiService {
                         console.log(error)
                         reject(error);
                     } else {
-                        console.log('Получили данные');
                         resolve(JSON.parse(body));
                     };
                 });
@@ -41,10 +42,6 @@ export class TftApiService {
             return null;
         }
         
-    }
-
-    public getLastBlock = async () => {
-        const result = await this.sendRequest('');
     }
 
     public getConsensus = async () => {
