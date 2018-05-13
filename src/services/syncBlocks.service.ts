@@ -1,5 +1,6 @@
 import { CurrencyService } from './currency.service';
 import { TftApiService } from './tftAPI.service';
+import { CacheService } from './cache.service';
 
 import * as Block from '../models/block';
 import * as Transaction from '../models/transaction';
@@ -7,6 +8,7 @@ import * as Transaction from '../models/transaction';
 export class SyncBlockService {
     private tftService;
     private currencyService;
+    private cache;
 
     private currentSyncedBlock;
     private isSynced;
@@ -17,6 +19,7 @@ export class SyncBlockService {
 
         this.tftService = new TftApiService();
         this.currencyService = new CurrencyService();
+        this.cache = new CacheService();
         this.runSync();
     }
 
@@ -138,6 +141,18 @@ export class SyncBlockService {
 
             await block.save();
 
+            const blockForCache = await Block.findById(block._id).lean();
+            const transactions = await Transaction.find({
+                'blockInfo.height': block.height
+            }).lean();
+
+            const cachedData = {
+                block: blockForCache,
+                transactions
+            }
+
+            this.cache.setField(`block_${block.height}`, cachedData, 30);
+
             currentIndex ++;
         }
 
@@ -161,6 +176,10 @@ export class SyncBlockService {
             return null;
         }
 
-        return this.runSync();
+        await this.runSync();
+
+        const lastBlocks = await Block.find({}).sort('-height').limit(10).lean();
+
+        return this.cache.setField(`lastBlocks`, lastBlocks, 300);
     }
 }

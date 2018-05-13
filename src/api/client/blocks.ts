@@ -3,22 +3,30 @@ import { TftApiService } from '../../services/tftAPI.service'
 
 import * as Block from '../../models/block';
 import * as Transaction from '../../models/transaction';
+import { CacheService } from '../../services/cache.service';
 
 export class Blocks {
     private tftApi;
-    private currencyService
+    private currencyService;
+    private cache;
 
     constructor() {
         this.tftApi = new TftApiService();
         this.currencyService = new CurrencyService();
+        this.cache = new CacheService();
     }
 
 
     getLastInfo = async (ctx) => {
         const main = await this.tftApi.getMainInfo();
-        const last5 = await this.tftApi.getLastBlocks(9);
 
-        if (!main || !last5 || !last5.length) {
+        let last10 = await this.cache.getField(`lastBlocks`);
+        if (!last10) {
+            last10 = await this.tftApi.getLastBlocks(9);
+            this.cache.setField(`lastBlocks`, last10, 300)
+        }
+
+        if (!main || !last10 || !last10.length) {
             return ctx.body = {
                 result: true,
                 message: 'Node not synced'
@@ -37,7 +45,7 @@ export class Blocks {
                     timeStamp: main.maturitytimestamp,
                     activeBlockStake: main.estimatedactivebs
                 },
-                lastBlocks: last5,
+                lastBlocks: last10,
                 currency: {
                     btcUsd: coinPrice,
                     usdEur: currencyRate
@@ -55,6 +63,15 @@ export class Blocks {
             } 
         }
 
+        const cachedData = await this.cache.getField(`block_${ctx.params.id}`);
+        if (cachedData) {
+            return ctx.body = {
+                result: true,
+                data: cachedData,
+                isCache: true
+            }
+        }
+
         const block = await Block.findOne({height: ctx.params.id}).lean();
         if (!block || block.message) {
             return ctx.body = {
@@ -67,12 +84,17 @@ export class Blocks {
             'blockInfo.height': block.height
         }).lean();
 
+        const data = {
+            block,
+            transactions
+        }
+
         ctx.body = {
             result: true,
-            data: {
-                block,
-                transactions
-            }
+            data,
+            isCache: false
         }
+
+        this.cache.setField(`block_${ctx.params.id}`, data, 30);
     }
 }
