@@ -13,7 +13,7 @@ router
     // BLOCKS
     .get('/block', block.getLastInfo)
 
-    .get('/block/:id', block.getByHeigth)
+    .get('/block/:id', block.getByHeight)
     // -----------------------------------------------
 
     // HASH

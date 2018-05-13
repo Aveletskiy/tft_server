@@ -31,7 +31,11 @@ const schema = new Schema({
         unique: true
     },
 
-    hashType: String,
+    hashType: {
+        type: String,
+        default: 'blockid'
+    },
+
     parentId: String,
     timeStamp: Number,
     difficulty: Number,

@@ -2,6 +2,7 @@ import { CurrencyService } from './currency.service';
 import { TftApiService } from './tftAPI.service';
 
 import * as Block from '../models/block';
+import * as Transaction from '../models/transaction';
 
 export class SyncBlockService {
     private tftService;
@@ -61,6 +62,79 @@ export class SyncBlockService {
                     usdEur: currencyRate
                 },
             });
+
+            console.log(block.height);
+
+            for (const item of currentBlock.block.transactions) {
+                const existTx = await Transaction.findById(item.id);
+                if (existTx) {
+                    continue;
+                }
+
+                const t = (await this.tftService.findByHash(item.id)).transaction;
+
+                const blockStakeInputs = [];
+
+                if (t.rawtransaction.data.blockstakeinputs) {
+                    for (let i = 0; i < t.rawtransaction.data.blockstakeinputs.length; i++) {
+                        const current = t.rawtransaction.data.blockstakeinputs[i];
+    
+                        const blockStake = {
+                            parentId: current.parentid,
+                            address: t.blockstakeinputoutputs[i].condition.data.unlockhash,
+                            value: Number.parseInt(t.blockstakeinputoutputs[i].value),
+                            unlockType: t.blockstakeinputoutputs[i].condition.type,
+                            publicKey: '',
+                            signature: ''
+                        };
+    
+                        if (current.fulfillment) {
+                            blockStake.publicKey = current.fulfillment.data.publickey;
+                            blockStake.signature = current.fulfillment.data.signature;
+                        } else if (current.unlocker && current.unlocker.fulfillment) {
+                            blockStake.publicKey = current.unlocker.condition.publickey;
+                            blockStake.signature = current.unlocker.fulfillment.signature;
+                        }
+    
+                        blockStakeInputs.push(blockStake);
+                    }
+                }
+                
+
+                const blockStakeOutputs = [];
+
+                if (t.rawtransaction.data.blockstakeoutputs) {
+                    for (let i = 0; i < t.rawtransaction.data.blockstakeoutputs.length; i++) {
+                        const current = t.rawtransaction.data.blockstakeoutputs[i];
+    
+                        blockStakeOutputs.push({
+                            id: t.blockstakeoutputids[i],
+                            address: current.unlockhash || current.condition.data.unlockhash,
+                            value: Number.parseInt(current.value),
+                        });
+                    }
+                }
+
+                const tx = new Transaction({
+                    _id: t.id,
+                    parentId: t.parent,
+                    blockInfo: {
+                        height: t.height,
+                        id: block._id,
+                        timeStamp: block.timeStamp,
+                    },
+                    blockStakeInputCount: blockStakeInputs.length,
+                    blockStakeOutputCount: blockStakeOutputs.length,
+                    blockStakeInputs,
+                    blockStakeOutputs,
+                    rates: {
+                        btcUsd: coinPrice,
+                        usdEur: currencyRate
+                    },
+                });
+
+                await tx.save();
+            }
 
             await block.save();
 

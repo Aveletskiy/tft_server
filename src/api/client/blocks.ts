@@ -1,6 +1,9 @@
 import { CurrencyService } from './../../services/currency.service';
 import { TftApiService } from '../../services/tftAPI.service'
 
+import * as Block from '../../models/block';
+import * as Transaction from '../../models/transaction';
+
 export class Blocks {
     private tftApi;
     private currencyService
@@ -43,7 +46,7 @@ export class Blocks {
         }
     }
 
-    getByHeigth = async (ctx) => {
+    getByHeight = async (ctx) => {
         const id = Number.parseInt(decodeURIComponent(ctx.params.id));
         if (!id) {
             return ctx.body = {
@@ -52,7 +55,7 @@ export class Blocks {
             } 
         }
 
-        const block = await this.tftApi.getBlockById(ctx.params.id);
+        const block = await Block.findOne({height: ctx.params.id}).lean();
         if (!block || block.message) {
             return ctx.body = {
                 result: false,
@@ -60,9 +63,16 @@ export class Blocks {
             }
         }
 
+        const transactions = await Transaction.find({
+            'blockInfo.height': block.height
+        }).lean();
+
         ctx.body = {
             result: true,
-            data: block
+            data: {
+                block,
+                transactions
+            }
         }
     }
 }
