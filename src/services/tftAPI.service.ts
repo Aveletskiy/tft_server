@@ -74,7 +74,7 @@ export class TftApiService {
             const block = (await this.getBlockById(currentHeight) as any).block;
 
             result.push({
-                id: block.blockid,
+                _id: block.blockid,
                 parentId: block.rawblock.parentid,
                 height: block.height,
                 difficulty: block.difficulty,
