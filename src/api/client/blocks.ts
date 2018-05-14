@@ -85,6 +85,7 @@ export class Blocks {
         }).lean();
 
         const data = {
+            hashType: 'blockid',
             block,
             transactions
         }
