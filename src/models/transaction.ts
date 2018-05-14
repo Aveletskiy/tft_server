@@ -31,7 +31,7 @@ interface ITransaction extends Document {
     blockStakeOutputs: IOutputs;
     сoinInput: IInputs;
     coinOutput: IOutputs;
-    сoinInputCount: number;
+    coinInputCount: number;
     coinOutputCount: number;
     rates: any;
     createdAt: Date;
@@ -56,7 +56,7 @@ const schema = new Schema({
     blockStakeInputCount: Number,
     blockStakeOutputCount: Number,
 
-    сoinInputCount: Number,
+    coinInputCount: Number,
     coinOutputCount: Number,
 
     parentId: String,

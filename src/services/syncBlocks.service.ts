@@ -173,7 +173,7 @@ export class SyncBlockService {
                     blockStakeOutputs,
                     coinInputs,
                     coinOutputs,
-                    сoinInputCount: coinInputs.length,
+                    coinInputCount: coinInputs.length,
                     coinOutputCount: coinOutputs.length,
                     rates: {
                         btcUsd: coinPrice,
