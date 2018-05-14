@@ -230,6 +230,11 @@ export class SyncBlockService {
 
         const lastBlocks = await Block.find({}).sort('-height').limit(10).lean();
 
+        const mаxSuply = await this.cache.getField(`mаxSuply`);
+        if (mаxSuply) {
+            this.cache.setField(`stats`, mаxSuply + lastBlocks[0].minerReward, 300);
+        }
+        
         return this.cache.setField(`lastBlocks`, lastBlocks, 300);
     }
 }

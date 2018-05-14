@@ -1,9 +1,10 @@
 import { CurrencyService } from './../../services/currency.service';
 import { TftApiService } from '../../services/tftAPI.service'
+import { CacheService } from '../../services/cache.service';
 
 import * as Block from '../../models/block';
 import * as Transaction from '../../models/transaction';
-import { CacheService } from '../../services/cache.service';
+
 
 export class Blocks {
     private tftApi;
@@ -24,6 +25,15 @@ export class Blocks {
         if (!last10) {
             last10 = await this.tftApi.getLastBlocks(9);
             this.cache.setField(`lastBlocks`, last10, 300)
+        }
+
+        let maxSuply = await this.cache.getField(`maxSuply`);
+        if (!maxSuply) {
+            maxSuply = {
+                value: await this.calculateMaxSuply(),
+                height: main.height
+            };
+            this.cache.setField(`maxSuply`, maxSuply);
         }
 
         if (!main || !last10 || !last10.length) {
@@ -49,7 +59,8 @@ export class Blocks {
                 currency: {
                     btcUsd: coinPrice,
                     usdEur: currencyRate
-                }
+                },
+                maxSuply: maxSuply.value,
             }
         }
     }
@@ -139,5 +150,17 @@ export class Blocks {
         }
 
         this.cache.setField(`block_${id}`, block, 30);
+    }
+
+    calculateMaxSuply = async () => {
+        console.log('calculateMaxSuply');
+        const stats = await Block.aggregate([{
+            $group: {
+                _id : null,
+                maxSuply: { $sum: '$minerReward' },
+            },
+        }]);
+
+        return stats[0].maxSuply;
     }
 }
