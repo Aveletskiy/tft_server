@@ -16,7 +16,7 @@ router
     .get('/block', block.getLastInfo)
 
     .get('/block/:id', block.getByHeight)
-    .get('/block/:id/transactions', block.getBlockTransactions)
+    .get('/block/:id/more', block.getBlockTransactions)
     // -----------------------------------------------
 
     // TRANSACTIONS

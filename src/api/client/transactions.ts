@@ -38,7 +38,10 @@ export class Transactions {
 
         return ctx.body = {
             result: true,
-            data: result,
+            data: {
+                list: result,
+                count: transaction[field].length,
+            },
             field,
         }
 
