@@ -101,6 +101,29 @@ export class SyncBlockService {
     
                         blockStakeInputs.push(blockStake);
                     }
+                } else if (t.rawtransaction.data.coininputs) {
+                    for (let i = 0; i < t.rawtransaction.data.coininputs.length; i++) {
+                        const current = t.rawtransaction.data.coininputs[i];
+    
+                        const blockStake = {
+                            parentId: current.parentid,
+                            address: t.coininputoutputs[i].condition.data.unlockhash,
+                            value: Number.parseInt(t.coininputoutputs[i].value),
+                            unlockType: t.coininputoutputs[i].condition.type,
+                            publicKey: '',
+                            signature: ''
+                        };
+    
+                        if (current.fulfillment) {
+                            blockStake.publicKey = current.fulfillment.data.publickey;
+                            blockStake.signature = current.fulfillment.data.signature;
+                        } else if (current.unlocker && current.unlocker.fulfillment) {
+                            blockStake.publicKey = current.unlocker.condition.publickey;
+                            blockStake.signature = current.unlocker.fulfillment.signature;
+                        }
+    
+                        blockStakeInputs.push(blockStake);
+                    }
                 }
                 
 
@@ -112,6 +135,16 @@ export class SyncBlockService {
     
                         blockStakeOutputs.push({
                             id: t.blockstakeoutputids[i],
+                            address: current.unlockhash || current.condition.data.unlockhash,
+                            value: Number.parseInt(current.value),
+                        });
+                    }
+                } else if (t.rawtransaction.data.coinoutputs) {
+                    for (let i = 0; i < t.rawtransaction.data.coinoutputs.length; i++) {
+                        const current = t.rawtransaction.data.coinoutputs[i];
+    
+                        blockStakeOutputs.push({
+                            id: t.coinoutputids[i],
                             address: current.unlockhash || current.condition.data.unlockhash,
                             value: Number.parseInt(current.value),
                         });
