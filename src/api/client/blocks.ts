@@ -59,7 +59,7 @@ export class Blocks {
         if (!id) {
             return ctx.body = {
                 result: false,
-                message: 'Invalid block id'
+                message: 'Invalid block id',
             } 
         }
 
@@ -68,7 +68,7 @@ export class Blocks {
             return ctx.body = {
                 result: true,
                 data: cachedData,
-                isCache: true
+                isCache: true,
             }
         }
 
@@ -79,7 +79,7 @@ export class Blocks {
         ctx.body = {
             result: true,
             data: transactions,
-            isCache: false
+            isCache: false,
         }
 
         this.cache.setField(`block_${id}_tx`, transactions, 30);
@@ -90,7 +90,7 @@ export class Blocks {
         if (!id) {
             return ctx.body = {
                 result: false,
-                message: 'Invalid block id'
+                message: 'Invalid block id',
             } 
         }
 
@@ -99,7 +99,7 @@ export class Blocks {
             return ctx.body = {
                 result: true,
                 data: cachedData,
-                isCache: true
+                isCache: true,
             }
         }
 
@@ -107,14 +107,14 @@ export class Blocks {
         if (!block || block.message) {
             return ctx.body = {
                 result: false,
-                message: 'Invalid block id'
+                message: 'Invalid block id',
             }
         }
 
         ctx.body = {
             result: true,
             data: block,
-            isCache: false
+            isCache: false,
         }
 
         this.cache.setField(`block_${id}`, block, 30);

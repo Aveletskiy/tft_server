@@ -30,7 +30,7 @@ export class Tick {
         try {
             this.socketService.sendTick({
                 lastBlock: {
-                    id: current.blockid,
+                    _id: current.blockid,
                     height: current.height,
                     parentId: current.rawblock.parentid,
                     difficulty: current.difficulty,

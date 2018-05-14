@@ -5,10 +5,13 @@ import { CacheService } from './cache.service';
 import * as Block from '../models/block';
 import * as Transaction from '../models/transaction';
 
+import * as logStdout from 'single-line-log';
+
 export class SyncBlockService {
     private tftService;
     private currencyService;
     private cache;
+    private log;
 
     private currentSyncedBlock;
     private isSynced;
@@ -16,6 +19,7 @@ export class SyncBlockService {
     constructor() {
         this.isSynced = false;
         this.currentSyncedBlock = 0;
+        this.log = logStdout.stdout;
 
         this.tftService = new TftApiService();
         this.currencyService = new CurrencyService();
@@ -65,8 +69,6 @@ export class SyncBlockService {
                     usdEur: currencyRate
                 },
             });
-
-            console.log(block.height);
 
             for (const item of currentBlock.block.transactions) {
                 const existTx = await Transaction.findById(item.id);
@@ -199,6 +201,9 @@ export class SyncBlockService {
             this.cache.setField(`block_${block.height}`, cachedData, 30);
 
             currentIndex ++;
+
+            this.log.clear();
+            this.log(`Current synced block ${block.height} / ${maxBlockHeight}`);
         }
 
         const newMaxBlockHeight = (await this.tftService.getCurrentInfo()).height;
