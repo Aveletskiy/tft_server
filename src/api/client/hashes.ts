@@ -24,15 +24,15 @@ export class Hashes {
             }
         }
 
-        let result = await Block.findById(ctx.params.hash);
+        let result = await Block.findById(ctx.params.hash).lean();
 
         if (!result) {
-            result = await Transaction.findById(ctx.params.hash);
+            result = await Transaction.findById(ctx.params.hash).lean();
         }       
 
-        if (!result) {
-            result = await this.tftApi.findByHash(ctx.params.hash);
-        }
+        // if (!result) {
+        //     result = await this.tftApi.findByHash(ctx.params.hash);
+        // }
 
         if (!result || result.message) {
             return ctx.body = {
@@ -41,12 +41,14 @@ export class Hashes {
             }
         }
 
-        // if (result.hashtype !== 'blockid' || result.hashtype !== 'transactionid') {
-        //     return ctx.body = {
-        //         result: false,
-        //         message: 'Unsupported hash type'
-        //     }
-        // }
+        if (result.hashType === 'transactionid') {
+            const limit = 10;
+
+            result.blockStakeInputs = result.blockStakeInputs.splice(0, limit)
+            result.blockStakeOutputs = result.blockStakeOutputs.splice(0, limit)
+            result.coinInputs = result.coinInputs.splice(0, limit)
+            result.coinOutputs = result.coinOutputs.splice(0, limit)
+        }
 
         ctx.body = {
             result: true,

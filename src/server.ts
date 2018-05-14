@@ -14,6 +14,7 @@ const port = process.env.PORT || config.get('port');
 import * as mongoose from 'mongoose';
 // mongoose.Promise = global.Promise;
 mongoose.connect(config.get('db'));
+// mongoose.set('debug', true);
 
 const tasks = new Tasks().runTasks();
 

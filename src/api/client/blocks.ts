@@ -74,6 +74,11 @@ export class Blocks {
 
         const transactions = await Transaction.find({
             'blockInfo.height': id
+        }).select({
+            blockStakeInputs: 0,
+            blockStakeOutputs: 0,
+            сoinInput: 0,
+            coinOutput: 0,
         }).lean();
 
         ctx.body = {

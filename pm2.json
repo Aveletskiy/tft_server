@@ -1,0 +1,11 @@
+{
+  "apps" : [{
+    "script"    : "./build/server.js",
+    "instances" : "1",
+    "exec_mode" : "cluster" ,
+    "name": "tft",
+    "env": {
+        "NODE_ENV": "production"
+    }
+  }]
+}

@@ -11,7 +11,7 @@ export class Transactions {
     getMoreInfo = async (ctx) => {
         let transaction = await this.cache.getField(`tx_${ctx.params.hash}`);
         if (!transaction) {
-            transaction = await Transaction.findById(ctx.params.hash);
+            transaction = await Transaction.findById(ctx.params.hash).lean();
             
             if (!transaction) {
                 return ctx.body = {
