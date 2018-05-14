@@ -34,7 +34,7 @@ export class Transactions {
             }
         }
 
-        const result = transaction[field].slice(skip, limit)
+        const result = transaction[field].splice(skip, limit)
 
         return ctx.body = {
             result: true,
