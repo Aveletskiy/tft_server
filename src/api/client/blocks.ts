@@ -54,6 +54,37 @@ export class Blocks {
         }
     }
 
+    getBlockTransactions = async (ctx) => {
+        const id = Number.parseInt(decodeURIComponent(ctx.params.id));
+        if (!id) {
+            return ctx.body = {
+                result: false,
+                message: 'Invalid block id'
+            } 
+        }
+
+        const cachedData = await this.cache.getField(`block_${id}_tx`);
+        if (cachedData) {
+            return ctx.body = {
+                result: true,
+                data: cachedData,
+                isCache: true
+            }
+        }
+
+        const transactions = await Transaction.find({
+            'blockInfo.height': id
+        }).lean();
+
+        ctx.body = {
+            result: true,
+            data: transactions,
+            isCache: false
+        }
+
+        this.cache.setField(`block_${id}_tx`, transactions, 30);
+    }
+
     getByHeight = async (ctx) => {
         const id = Number.parseInt(decodeURIComponent(ctx.params.id));
         if (!id) {
@@ -63,7 +94,7 @@ export class Blocks {
             } 
         }
 
-        const cachedData = await this.cache.getField(`block_${ctx.params.id}`);
+        const cachedData = await this.cache.getField(`block_${id}`);
         if (cachedData) {
             return ctx.body = {
                 result: true,
@@ -72,7 +103,7 @@ export class Blocks {
             }
         }
 
-        const block = await Block.findOne({height: ctx.params.id}).lean();
+        const block = await Block.findOne({height: id}).lean();
         if (!block || block.message) {
             return ctx.body = {
                 result: false,
@@ -80,22 +111,12 @@ export class Blocks {
             }
         }
 
-        const transactions = await Transaction.find({
-            'blockInfo.height': block.height
-        }).lean();
-
-        const data = {
-            hashType: 'blockid',
-            block,
-            transactions
-        }
-
         ctx.body = {
             result: true,
-            data,
+            data: block,
             isCache: false
         }
 
-        this.cache.setField(`block_${ctx.params.id}`, data, 30);
+        this.cache.setField(`block_${id}`, block, 30);
     }
 }
