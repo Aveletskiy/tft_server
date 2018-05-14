@@ -39,7 +39,7 @@ export class Blocks {
             result: true,
             data: {
                 lastBlock: {
-                    id: main.blockid,
+                    _id: main.blockid,
                     height: main.height,
                     difficulty: main.difficulty,
                     timeStamp: main.maturitytimestamp,
