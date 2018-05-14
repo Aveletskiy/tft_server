@@ -63,11 +63,17 @@ export class Blocks {
             } 
         }
 
+        let limit = ctx.query.limit || 5;
+        let skip = ctx.query.skip || 0;
+
         const cachedData = await this.cache.getField(`block_${id}_tx`);
         if (cachedData) {
             return ctx.body = {
                 result: true,
-                data: cachedData,
+                data: {
+                    list: cachedData.slice(skip, limit),
+                    count: cachedData.length,
+                },
                 isCache: true,
             }
         }
@@ -81,9 +87,19 @@ export class Blocks {
             coinOutput: 0,
         }).lean();
 
+        for (const tx of transactions) {
+            delete tx.blockStakeInputs
+            delete tx.blockStakeOutputs 
+            delete tx.coinInputs
+            delete tx.coinOutputs
+        }
+
         ctx.body = {
             result: true,
-            data: transactions,
+            data: {
+                list: transactions.slice(skip, limit),
+                count: transactions.length,
+            },
             isCache: false,
         }
 

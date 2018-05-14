@@ -44,10 +44,10 @@ export class Hashes {
         if (result.hashType === 'transactionid') {
             const limit = 10;
 
-            result.blockStakeInputs = result.blockStakeInputs.splice(0, limit)
-            result.blockStakeOutputs = result.blockStakeOutputs.splice(0, limit)
-            result.coinInputs = result.coinInputs.splice(0, limit)
-            result.coinOutputs = result.coinOutputs.splice(0, limit)
+            result.blockStakeInputs = result.blockStakeInputs.slice(0, limit);
+            result.blockStakeOutputs = result.blockStakeOutputs.slice(0, limit);
+            result.coinInputs = result.coinInputs.slice(0, limit);
+            result.coinOutputs = result.coinOutputs.slice(0, limit);
         }
 
         ctx.body = {
