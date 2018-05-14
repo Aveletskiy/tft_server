@@ -101,7 +101,11 @@ export class SyncBlockService {
     
                         blockStakeInputs.push(blockStake);
                     }
-                } else if (t.rawtransaction.data.coininputs) {
+                }
+                
+                const coinInputs = [];
+
+                if (t.rawtransaction.data.coininputs) {
                     for (let i = 0; i < t.rawtransaction.data.coininputs.length; i++) {
                         const current = t.rawtransaction.data.coininputs[i];
     
@@ -122,7 +126,7 @@ export class SyncBlockService {
                             blockStake.signature = current.unlocker.fulfillment.signature;
                         }
     
-                        blockStakeInputs.push(blockStake);
+                        coinInputs.push(blockStake);
                     }
                 }
                 
@@ -139,11 +143,15 @@ export class SyncBlockService {
                             value: Number.parseInt(current.value),
                         });
                     }
-                } else if (t.rawtransaction.data.coinoutputs) {
+                }
+                
+                const coinOutputs = [];
+
+                if (t.rawtransaction.data.coinoutputs) {
                     for (let i = 0; i < t.rawtransaction.data.coinoutputs.length; i++) {
                         const current = t.rawtransaction.data.coinoutputs[i];
     
-                        blockStakeOutputs.push({
+                        coinOutputs.push({
                             id: t.coinoutputids[i],
                             address: current.unlockhash || current.condition.data.unlockhash,
                             value: Number.parseInt(current.value),
@@ -163,6 +171,10 @@ export class SyncBlockService {
                     blockStakeOutputCount: blockStakeOutputs.length,
                     blockStakeInputs,
                     blockStakeOutputs,
+                    coinInputs,
+                    coinOutputs,
+                    сoinInputCount: coinInputs.length,
+                    coinOutputCount: coinOutputs.length,
                     rates: {
                         btcUsd: coinPrice,
                         usdEur: currencyRate

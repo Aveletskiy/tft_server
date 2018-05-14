@@ -1,6 +1,6 @@
 import {Document, model, Model, Schema} from 'mongoose';
 
-interface IBlockStakeInputs {
+interface IInputs {
     parentId: string;
     address: string;
     value: number;
@@ -9,7 +9,7 @@ interface IBlockStakeInputs {
     signature: string;
 }
 
-interface IBlockStakeOutputs {
+interface IOutputs {
     id: string;
     address: string;
     value: number;
@@ -27,8 +27,12 @@ interface ITransaction extends Document {
     blockStakeInputCount: number;
     blockStakeOutputCount: number;
     parentId: string;
-    blockStakeInputs: IBlockStakeInputs;
-    blockStakeOutputs: IBlockStakeOutputs;
+    blockStakeInputs: IInputs;
+    blockStakeOutputs: IOutputs;
+    сoinInput: IInputs;
+    coinOutput: IOutputs;
+    сoinInputCount: number;
+    coinOutputCount: number;
     rates: any;
     createdAt: Date;
 }
@@ -52,6 +56,9 @@ const schema = new Schema({
     blockStakeInputCount: Number,
     blockStakeOutputCount: Number,
 
+    сoinInputCount: Number,
+    coinOutputCount: Number,
+
     parentId: String,
 
     blockStakeInputs: [{
@@ -64,6 +71,21 @@ const schema = new Schema({
     }],
 
     blockStakeOutputs: [{
+        id: String,
+        address: String,
+        value: Number,
+    }],
+
+    coinInputs: [{
+        parentId: String,
+        address: String,
+        value: Number,
+        unlockType: Number,
+        publicKey: String,
+        signature: String,
+    }],
+
+    coinOutputs: [{
         id: String,
         address: String,
         value: Number,
