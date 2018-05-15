@@ -27,11 +27,23 @@ const schema = new Schema({
         default: 'unlockhash'
     },
 
-    blockStakeInputCount: Number,
-    blockStakeOutputCount: Number,
+    blockStakeInputCount: {
+        type: Number,
+        default: 0
+    },
+    blockStakeOutputCount: {
+        type: Number,
+        default: 0
+    },
 
-    coinInputCount: Number,
-    coinOutputCount: Number,
+    coinInputCount: {
+        type: Number,
+        default: 0
+    },
+    coinOutputCount: {
+        type: Number,
+        default: 0
+    },
 
     сoinInput: [],
     coinOutput: [],
