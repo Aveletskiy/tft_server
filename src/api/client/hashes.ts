@@ -159,6 +159,7 @@ export class Hashes {
                 };
 
                 const blocks = await Block.find(blockQuery).limit(limit).sort('-createdAt').lean();
+                result.blockStakeMotionCount = await Block.count(blockQuery);
 
                 for (const block of blocks) {
                     for (const payout of block.minerPayouts) {
