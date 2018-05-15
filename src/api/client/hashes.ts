@@ -185,14 +185,10 @@ export class Hashes {
             }
         } 
 
-        // if (!result) {
-        //     result = await this.tftApi.findByHash(ctx.params.hash);
-        // }
-
         if (!result || result.message) {
             return ctx.body = {
                 result: false,
-                message: 'Invalid hash'
+                message: 'Invalid or unsupported hash'
             }
         }
 

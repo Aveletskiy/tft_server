@@ -5,11 +5,13 @@ import { Blocks } from './blocks';
 import { Hashes } from './hashes';
 import { Peers } from './peers';
 import { Transactions } from './transactions';
+import { Wallets } from './wallets';
 
 const block = new Blocks();
 const hashes = new Hashes();
 const peers = new Peers();
 const transactions = new Transactions();
+const wallets = new Wallets();
 
 router
     // BLOCKS
@@ -21,6 +23,10 @@ router
 
     // TRANSACTIONS
     .get('/transaction/:hash/:field', transactions.getMoreInfo)
+    // -----------------------------------------------
+
+    // WALLET
+    .get('/wallet/:hash/:field', wallets.getMoreInfo)
     // -----------------------------------------------
 
     // HASH
