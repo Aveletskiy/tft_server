@@ -34,13 +34,14 @@ export class Transactions {
             }
         }
 
+        const count = transaction[field].length;
         const result = transaction[field].splice(skip, limit)
 
         return ctx.body = {
             result: true,
             data: {
                 list: result,
-                count: transaction[field].length,
+                count,
             },
             field,
         }
