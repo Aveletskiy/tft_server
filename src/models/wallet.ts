@@ -3,11 +3,13 @@ import {Document, model, Model, Schema} from 'mongoose';
 interface IWallet extends Document {
     hashType: string;
     balance: number;
-    coinsMotionCount: number;
+    transactionsCount: number;
     blockStakeMotionCount: number;
+    minerPayoutsCount: number;
 
     blockStakeMotion: any;
-    coinsMotion: any;
+    transactions: any;
+    minerPayouts: any;
     
     updatedAt: Date;
     createdAt: Date;
@@ -23,7 +25,7 @@ const schema = new Schema({
         default: 'unlockhash'
     },
 
-    coinsMotionCount: {
+    transactionsCount: {
         type: Number,
         default: 0
     },
@@ -31,9 +33,14 @@ const schema = new Schema({
         type: Number,
         default: 0
     },
+    minerPayoutsCount: {
+        type: Number,
+        default: 0
+    },
 
     blockStakeMotion: [],
-    coinsMotion: [],
+    transactions: [],
+    minerPayouts: [],
 
     balance: {
         type: Number,
