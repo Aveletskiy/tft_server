@@ -57,8 +57,7 @@ export class Hashes {
                 };
 
                 const transactions = await Transaction.find(txQuery).limit(limit).sort('-createdAt').lean();
-
-                result.transactionCount = await Transaction.count(txQuery);
+                result.transactionsCount = await Transaction.count(txQuery);
 
                 for (const tx of transactions) {
                     const userTx = {
@@ -117,7 +116,7 @@ export class Hashes {
                         result.transactions.push(userTx);
                     }
 
-                    if (result.transactionCount) {
+                    if (result.transactionsCount) {
                         result.balance = result.transactions[0].balanceAfter;
                     }
                 }
@@ -131,7 +130,6 @@ export class Hashes {
                 };
 
                 const transactionsBs = await Transaction.find(txQuery).limit(limit).sort('-createdAt').lean();
-
                 result.blockStakeMotionCount = await Transaction.count(txQuery);
 
                 for (const tx of transactionsBs) {
