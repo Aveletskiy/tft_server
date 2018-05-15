@@ -33,6 +33,7 @@ interface ITransaction extends Document {
     coinOutput: IOutputs;
     coinInputCount: number;
     coinOutputCount: number;
+    minerFees: any;
     rates: any;
     createdAt: Date;
 }
@@ -91,6 +92,7 @@ const schema = new Schema({
         value: Number,
     }],
     
+    minerFees: [],
 
     rates: {},
         

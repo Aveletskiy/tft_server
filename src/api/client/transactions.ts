@@ -25,7 +25,7 @@ export class Transactions {
 
         let limit = ctx.query.limit || 5;
         let skip = ctx.query.skip || 0;
-        let field = ctx.query.field || 'coinOutputs';
+        let field = ctx.params.field || 'coinOutputs';
 
         if (transaction[field].length < skip) {
             return ctx.body = {

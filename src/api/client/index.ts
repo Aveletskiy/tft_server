@@ -20,7 +20,7 @@ router
     // -----------------------------------------------
 
     // TRANSACTIONS
-    .get('/transaction/:hash/more', transactions.getMoreInfo)
+    .get('/transaction/:hash/:field', transactions.getMoreInfo)
     // -----------------------------------------------
 
     // HASH

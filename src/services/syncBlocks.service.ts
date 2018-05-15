@@ -4,6 +4,7 @@ import { CacheService } from './cache.service';
 
 import * as Block from '../models/block';
 import * as Transaction from '../models/transaction';
+import * as Wallet from '../models/wallet';
 
 import * as logStdout from 'single-line-log';
 
@@ -50,6 +51,8 @@ export class SyncBlockService {
                     unlockHash: currentBlock.block.rawblock.minerpayouts[i].unlockhash,
                     value: Number.parseInt(currentBlock.block.rawblock.minerpayouts[i].value),
                 });
+
+                await this.checkNewWallet(currentBlock.block.rawblock.minerpayouts[i].unlockhash);
             }
 
             const block = new Block({
@@ -102,6 +105,8 @@ export class SyncBlockService {
                         }
     
                         blockStakeInputs.push(blockStake);
+
+                        await this.checkNewWallet(blockStake.address);
                     }
                 }
                 
@@ -129,6 +134,8 @@ export class SyncBlockService {
                         }
     
                         coinInputs.push(blockStake);
+
+                        await this.checkNewWallet(blockStake.address);
                     }
                 }
                 
@@ -144,6 +151,8 @@ export class SyncBlockService {
                             address: current.unlockhash || current.condition.data.unlockhash,
                             value: Number.parseInt(current.value),
                         });
+
+                        await this.checkNewWallet(current.unlockhash || current.condition.data.unlockhash);
                     }
                 }
                 
@@ -158,6 +167,8 @@ export class SyncBlockService {
                             address: current.unlockhash || current.condition.data.unlockhash,
                             value: Number.parseInt(current.value),
                         });
+
+                        await this.checkNewWallet(current.unlockhash || current.condition.data.unlockhash);
                     }
                 }
 
@@ -177,6 +188,7 @@ export class SyncBlockService {
                     coinOutputs,
                     coinInputCount: coinInputs.length,
                     coinOutputCount: coinOutputs.length,
+                    minerFees: t.rawtransaction.data.minerfees,
                     rates: {
                         btcUsd: coinPrice,
                         usdEur: currencyRate
@@ -214,7 +226,22 @@ export class SyncBlockService {
         this.isSynced = true;
         this.currentSyncedBlock = maxBlockHeight;
 
-        return null;
+        return;
+    }
+
+    private checkNewWallet = async (address: string) => {
+        if (!address) {
+            return;
+        }
+
+        const exist = await Wallet.findById(address);
+        if (!exist) {
+            await new Wallet({
+                _id: address
+            }).save()
+        }
+
+        return;
     }
 
     public syncBlockByHeight = async (height: number) => {

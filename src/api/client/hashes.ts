@@ -1,8 +1,10 @@
 import { TftApiService } from '../../services/tftAPI.service'
+import { CacheService } from '../../services/cache.service';
 
 import * as Block from '../../models/block';
 import * as Transaction from '../../models/transaction';
-import { CacheService } from '../../services/cache.service';
+import * as Wallet from '../../models/wallet';
+
 
 export class Hashes {
     private tftApi;
@@ -28,7 +30,24 @@ export class Hashes {
 
         if (!result) {
             result = await Transaction.findById(ctx.params.hash).lean();
-        }       
+
+            if (result) {
+                const limit = 10;
+
+                result.blockStakeInputs = result.blockStakeInputs.slice(0, limit);
+                result.blockStakeOutputs = result.blockStakeOutputs.slice(0, limit);
+                result.coinInputs = result.coinInputs.slice(0, limit);
+                result.coinOutputs = result.coinOutputs.slice(0, limit);
+            } 
+        }
+        
+        if (!result) {
+            result = await Wallet.findById(ctx.params.hash).lean();
+
+            if (result) {
+                
+            }
+        } 
 
         // if (!result) {
         //     result = await this.tftApi.findByHash(ctx.params.hash);
@@ -39,15 +58,6 @@ export class Hashes {
                 result: false,
                 message: 'Invalid hash'
             }
-        }
-
-        if (result.hashType === 'transactionid') {
-            const limit = 10;
-
-            result.blockStakeInputs = result.blockStakeInputs.slice(0, limit);
-            result.blockStakeOutputs = result.blockStakeOutputs.slice(0, limit);
-            result.coinInputs = result.coinInputs.slice(0, limit);
-            result.coinOutputs = result.coinOutputs.slice(0, limit);
         }
 
         ctx.body = {

@@ -44,6 +44,12 @@ export class Tick {
                 this.cache.setField(`maxSuply`, maxSuply);
             }
 
+            if (!maxSuply) {
+                maxSuply = {
+                    value: 0,
+                };
+            }
+
             this.socketService.sendTick({
                 lastBlock: {
                     _id: current.blockid,
@@ -59,7 +65,7 @@ export class Tick {
                     btcUsd: coinPrice,
                     usdEur: currencyRate
                 },
-                maxSuply: maxSuply.value || 0
+                maxSuply: maxSuply.value
             })
 
             if (this.syncedBlock !== current.height) {
