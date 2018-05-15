@@ -50,10 +50,6 @@ export class Hashes {
 
                 const txQuery = {
                     $or: [{
-                        'blockStakeInputs.address': hash
-                    }, {
-                        'blockStakeOutputs.address': hash
-                    }, {
                         'coinInputs.address': hash
                     }, {
                         'coinOutputs.address': hash
@@ -121,6 +117,25 @@ export class Hashes {
                         result.transactions.push(userTx);
                     }
 
+                    if (result.transactionCount) {
+                        result.balance = result.transactions[0].balanceAfter;
+                    }
+                }
+
+                const bsQuery = {
+                    $or: [{
+                        'blockStakeInputs.address': hash
+                    }, {
+                        'blockStakeOutputs.address': hash
+                    }],
+                };
+
+                const transactionsBs = await Transaction.find(txQuery).limit(limit).sort('-createdAt').lean();
+
+                result.blockStakeMotionCount = await Transaction.count(txQuery);
+
+                for (const tx of transactionsBs) {
+
                     if (tx.blockStakeInputCount) {
                         for (const stake of tx.blockStakeInputs) {
                            if (stake.address === hash) {
@@ -149,10 +164,6 @@ export class Hashes {
                          }  
                     }
                 }
-
-                // if (result.transactionCount) {
-                //     result.balance = result.transactions[0].balanceAfter;
-                // }
 
                 const blockQuery = {
                     'minerPayouts.unlockHash': hash
