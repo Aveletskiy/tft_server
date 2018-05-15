@@ -114,7 +114,7 @@ export class Blocks {
 
     getByHeight = async (ctx) => {
         const id = Number.parseInt(decodeURIComponent(ctx.params.id));
-        if (!id) {
+        if (!id && id !== 0) {
             return ctx.body = {
                 result: false,
                 message: 'Invalid block id',
