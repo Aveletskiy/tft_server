@@ -75,10 +75,13 @@ export class Hashes {
 
                     const notOut = tx.coinOutputs.find((el) => el.address === hash);
 
+                    if (tx.coinInputCount && tx.coinInputs[0].address === hash) {
+                        userTx.isLoading = false;
+                    }
+
                     if (tx.coinInputCount && !notOut) {
                         if (tx.coinInputs[0].address === hash) {
                             userTx.from = hash;
-                            userTx.isLoading = false;
                             userTx.coinsInputSumm = tx.coinInputs.reduce((prev, current) => {
                                 return prev + current.value
                             }, 0);
@@ -93,9 +96,7 @@ export class Hashes {
                                     userTx.coinsSumm += out.value;
                                 }
 
-                                if (out.address === hash) {
-                                    userTx.balanceAfter = out.value;
-                                }
+                                
 
                             }
                         }
@@ -107,13 +108,17 @@ export class Hashes {
                                 userTx.from = tx.coinInputs[0].address;
                             }
                             
-                            if (out.address === hash) {
+                            if (out.address !== hash) {
                                 userTx.motion.push({
-                                    to: hash,
+                                    to: out.address,
                                     value: out.value
                                 });
 
                                 userTx.coinsSumm += out.value;
+                            }
+
+                            if (out.address === hash) {
+                                userTx.balanceAfter = out.value;
                             }
                         }
                     }
@@ -145,7 +150,8 @@ export class Hashes {
                                 blockHeigth: tx.blockInfo.height,
                                 timeStamp: tx.blockInfo.timeStamp,
                                 rates: tx.rates,
-                                isInput: true
+                                isInput: true,
+                                parentTransaction: tx._id
                             })
                            } 
                         }  
@@ -159,7 +165,8 @@ export class Hashes {
                                  blockHeigth: tx.blockInfo.height,
                                  timeStamp: tx.blockInfo.timeStamp,
                                  rates: tx.rates,
-                                 isInput: false
+                                 isInput: false,
+                                 parentTransaction: tx._id
                              })
                             } 
                          }  
