@@ -73,31 +73,33 @@ export class Hashes {
                         rates: tx.rates
                     }
 
-                    // if (tx.coinInputCount) {
-                    //     if (tx.coinInputs[0].address === hash) {
-                    //         userTx.from = hash;
-                    //         userTx.isLoading = false;
-                    //         userTx.coinsInputSumm = tx.coinInputs.reduce((prev, current) => {
-                    //             return prev + current.value
-                    //         }, 0);
+                    const notOut = tx.coinOutputs.find((el) => el.address === hash);
+
+                    if (tx.coinInputCount && !notOut) {
+                        if (tx.coinInputs[0].address === hash) {
+                            userTx.from = hash;
+                            userTx.isLoading = false;
+                            userTx.coinsInputSumm = tx.coinInputs.reduce((prev, current) => {
+                                return prev + current.value
+                            }, 0);
  
-                    //         for (const out of tx.coinOutputs) {
-                    //             if (out.address !== hash) {
-                    //                 userTx.motion.push({
-                    //                     to: out.address,
-                    //                     value: out.value
-                    //                 });
+                            for (const out of tx.coinOutputs) {
+                                if (out.address !== hash) {
+                                    userTx.motion.push({
+                                        to: out.address,
+                                        value: out.value
+                                    });
 
-                    //                 userTx.coinsSumm += out.value;
-                    //             }
+                                    userTx.coinsSumm += out.value;
+                                }
 
-                    //             if (out.address === hash) {
-                    //                 userTx.balanceAfter = out.value;
-                    //             }
+                                if (out.address === hash) {
+                                    userTx.balanceAfter = out.value;
+                                }
 
-                    //         }
-                    //     }
-                    // } 
+                            }
+                        }
+                    } 
                     
                     if (tx.coinOutputCount) {
                         for (const out of tx.coinOutputs) {
@@ -116,7 +118,10 @@ export class Hashes {
                         }
                     }
                     
-                    result.transactions.push(userTx);
+                    if (userTx.motion.length) {
+                        result.transactions.push(userTx);
+                    }
+
                 }
 
                 const bsQuery = {
@@ -195,6 +200,6 @@ export class Hashes {
             data: result
         }
 
-        this.cache.setField(`hash_${ctx.params.hash}`, result, 30);
+        // this.cache.setField(`hash_${ctx.params.hash}`, result, 30);
     }
 }
