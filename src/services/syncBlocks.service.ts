@@ -169,11 +169,11 @@ export class SyncBlockService {
     
                         coinOutputs.push({
                             id: t.coinoutputids[i],
-                            address: current.unlockhash || current.condition.data.unlockhash,
+                            address: current.unlockhash || current.condition.data.unlockhash || current.condition.data.condition.data.unlockhash,
                             value: Number.parseInt(current.value),
                         });
 
-                        await this.checkNewWallet(current.unlockhash || current.condition.data.unlockhash);
+                        await this.checkNewWallet(current.unlockhash || current.condition.data.unlockhash || current.condition.data.condition.data.unlockhash);
                     }
                 }
 

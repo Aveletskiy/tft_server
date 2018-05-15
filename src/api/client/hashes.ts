@@ -73,52 +73,50 @@ export class Hashes {
                         rates: tx.rates
                     }
 
-                    if (tx.coinInputCount) {
-                        if (tx.coinInputs[0].address === hash) {
-                            userTx.from = hash;
-                            userTx.isLoading = false;
-                            userTx.coinsInputSumm = tx.coinInputs.reduce((prev, current) => {
-                                return prev + current.value
-                            }, 0);
+                    // if (tx.coinInputCount) {
+                    //     if (tx.coinInputs[0].address === hash) {
+                    //         userTx.from = hash;
+                    //         userTx.isLoading = false;
+                    //         userTx.coinsInputSumm = tx.coinInputs.reduce((prev, current) => {
+                    //             return prev + current.value
+                    //         }, 0);
  
-                            for (const out of tx.coinOutputs) {
-                                if (out.address !== hash) {
-                                    userTx.motion.push({
-                                        to: out.address,
-                                        value: out.value
-                                    });
+                    //         for (const out of tx.coinOutputs) {
+                    //             if (out.address !== hash) {
+                    //                 userTx.motion.push({
+                    //                     to: out.address,
+                    //                     value: out.value
+                    //                 });
 
-                                    userTx.coinsSumm += out.value;
-                                }
+                    //                 userTx.coinsSumm += out.value;
+                    //             }
 
-                                if (out.address === hash) {
-                                    userTx.balanceAfter = out.value;
-                                }
-                            }
+                    //             if (out.address === hash) {
+                    //                 userTx.balanceAfter = out.value;
+                    //             }
 
-                        } else {
-                            for (const out of tx.coinOutputs) {
+                    //         }
+                    //     }
+                    // } 
+                    
+                    if (tx.coinOutputCount) {
+                        for (const out of tx.coinOutputs) {
+                            if (tx.coinInputCount) {
                                 userTx.from = tx.coinInputs[0].address;
+                            }
+                            
+                            if (out.address === hash) {
+                                userTx.motion.push({
+                                    to: hash,
+                                    value: out.value
+                                });
 
-                                if (out.address === hash) {
-                                    userTx.motion.push({
-                                        to: hash,
-                                        value: out.value
-                                    });
-
-                                    userTx.coinsSumm += out.value;
-                                }
+                                userTx.coinsSumm += out.value;
                             }
                         }
                     }
-
-                    if (userTx.motion.length) {
-                        result.transactions.push(userTx);
-                    }
-
-                    if (result.transactionsCount) {
-                        result.balance = result.transactions[0].balanceAfter;
-                    }
+                    
+                    result.transactions.push(userTx);
                 }
 
                 const bsQuery = {
@@ -129,8 +127,8 @@ export class Hashes {
                     }],
                 };
 
-                const transactionsBs = await Transaction.find(txQuery).limit(limit).sort('-createdAt').lean();
-                result.blockStakeMotionCount = await Transaction.count(txQuery);
+                const transactionsBs = await Transaction.find(bsQuery).limit(limit).sort('-createdAt').lean();
+                result.blockStakeMotionCount = await Transaction.count(bsQuery);
 
                 for (const tx of transactionsBs) {
 
@@ -197,6 +195,6 @@ export class Hashes {
             data: result
         }
 
-        this.cache.setField(`hash_${ctx.params.hash}`, result, 30);
+        // this.cache.setField(`hash_${ctx.params.hash}`, result, 30);
     }
 }
