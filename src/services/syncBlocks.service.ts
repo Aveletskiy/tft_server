@@ -19,7 +19,7 @@ export class SyncBlockService {
 
     constructor() {
         this.isSynced = false;
-        this.currentSyncedBlock = 0;
+        this.currentSyncedBlock = -1;
         this.log = logStdout.stdout;
 
         this.tftService = new TftApiService();
@@ -32,7 +32,7 @@ export class SyncBlockService {
         const maxBlockHeight = (await this.tftService.getCurrentInfo()).height;
         const lastSyncedBlock = await Block.findOne({}).sort('-height').select('height').lean();
 
-        let startIndex = 1;
+        let startIndex = 0;
 
         if (lastSyncedBlock) {
             startIndex = lastSyncedBlock.height + 1;
@@ -45,14 +45,21 @@ export class SyncBlockService {
             const { coinPrice, currencyRate } = await this.currencyService.getLastInfo('BTC', 'USD');
             const minerPayouts = [];
 
-            for (let i = 0; i < currentBlock.block.minerpayoutids.length; i++) {
-                minerPayouts.push({
-                    minerPayoutId: currentBlock.block.minerpayoutids[i],
-                    unlockHash: currentBlock.block.rawblock.minerpayouts[i].unlockhash,
-                    value: Number.parseInt(currentBlock.block.rawblock.minerpayouts[i].value),
-                });
 
-                await this.checkNewWallet(currentBlock.block.rawblock.minerpayouts[i].unlockhash);
+            let minerReward = 0;
+
+            if (currentBlock.block.minerpayoutids) {
+                for (let i = 0; i < currentBlock.block.minerpayoutids.length; i++) {
+                    minerPayouts.push({
+                        minerPayoutId: currentBlock.block.minerpayoutids[i],
+                        unlockHash: currentBlock.block.rawblock.minerpayouts[i].unlockhash,
+                        value: Number.parseInt(currentBlock.block.rawblock.minerpayouts[i].value),
+                    });
+
+                    minerReward += Number.parseInt(currentBlock.block.rawblock.minerpayouts[i].value);
+    
+                    await this.checkNewWallet(currentBlock.block.rawblock.minerpayouts[i].unlockhash);
+                }
             }
 
             const block = new Block({
@@ -63,9 +70,7 @@ export class SyncBlockService {
                 difficulty: Number.parseInt(currentBlock.block.difficulty),
                 activeBlockStake: Number.parseInt(currentBlock.block.estimatedactivebs),
                 transactionsCount: currentBlock.block.transactions.length,
-                minerReward: currentBlock.block.rawblock.minerpayouts.reduce((prev, current) => {
-                    return prev + Number.parseInt(current.value);
-                }, 0),
+                minerReward,
                 minerPayouts,
                 rates: {
                     btcUsd: coinPrice,
