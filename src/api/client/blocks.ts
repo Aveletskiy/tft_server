@@ -82,7 +82,7 @@ export class Blocks {
             return ctx.body = {
                 result: true,
                 data: {
-                    list: cachedData.slice(skip, limit),
+                    list: cachedData.splice(skip, limit),
                     count: cachedData.length,
                 },
                 isCache: true,
@@ -91,30 +91,25 @@ export class Blocks {
 
         const transactions = await Transaction.find({
             'blockInfo.height': id
-        }).select({
-            blockStakeInputs: 0,
-            blockStakeOutputs: 0,
-            сoinInput: 0,
-            coinOutput: 0,
         }).lean();
-
+        
         for (const tx of transactions) {
-            delete tx.blockStakeInputs
-            delete tx.blockStakeOutputs 
-            delete tx.coinInputs
-            delete tx.coinOutputs
+            delete tx.blockStakeInputs;
+            delete tx.blockStakeOutputs;
+            delete tx.coinInputs;
+            delete tx.coinOutputs;
         }
+
+        await this.cache.setField(`block_${id}_tx`, transactions, 30);
 
         ctx.body = {
             result: true,
             data: {
-                list: transactions.slice(skip, limit),
+                list: transactions.splice(skip, limit),
                 count: transactions.length,
             },
             isCache: false,
         }
-
-        this.cache.setField(`block_${id}_tx`, transactions, 30);
     }
 
     getByHeight = async (ctx) => {
