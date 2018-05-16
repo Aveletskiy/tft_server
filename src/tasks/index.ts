@@ -1,9 +1,9 @@
-
 import * as cron from 'node-cron';
 import * as chalk from 'chalk';
 
 import { Tick } from './tick';
 import { Curency } from './currency';
+
 
 export class Tasks {
     private tick = new Tick();

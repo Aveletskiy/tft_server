@@ -1,5 +1,4 @@
 import { CurrencyService } from './../services/currency.service';
-import * as Rate from '../models/rate';
 
 export class Curency {
     private currencyService
@@ -11,14 +10,5 @@ export class Curency {
     updateCurrencyInfo = async () => {
         const coinPrice = await this.currencyService.getCoinPrice('BTC');
         const euroRate = await this.currencyService.getEuroRate('USD');
-
-        const rate = new Rate({
-            prices: {
-                btcToUsd: coinPrice,
-                eurToUsd: euroRate
-            }
-        });
-
-        await rate.save();
     }
 }
