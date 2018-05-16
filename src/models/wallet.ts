@@ -3,6 +3,7 @@ import {Document, model, Model, Schema} from 'mongoose';
 interface IWallet extends Document {
     hashType: string;
     balance: number;
+    totalReceived: number;
     transactionsCount: number;
     blockStakeMotionCount: number;
     minerPayoutsCount: number;
@@ -43,6 +44,11 @@ const schema = new Schema({
     minerPayouts: [],
 
     balance: {
+        type: Number,
+        default: 0
+    },
+
+    totalReceived: {
         type: Number,
         default: 0
     },

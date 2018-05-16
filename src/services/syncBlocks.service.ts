@@ -28,6 +28,29 @@ export class SyncBlockService {
         this.runSync();
     }
 
+    private addBalance = async (address: string, value: number) => {
+        return await Wallet.update({
+            _id: address
+        }, {
+            $inc: {
+                balance: value,
+                totalReceived: value
+            },
+            updatedAt: new Date()
+        })
+    }
+
+    private removeBalance = async (address: string, value: number) => {
+        return await Wallet.update({
+            _id: address
+        }, {
+            $inc: {
+                balance: value * -1,
+            },
+            updatedAt: new Date()
+        });
+    }
+
     private runSync = async () => {
         const maxBlockHeight = (await this.tftService.getCurrentInfo()).height;
         const lastSyncedBlock = await Block.findOne({}).sort('-height').select('height').lean();
@@ -50,15 +73,18 @@ export class SyncBlockService {
 
             if (currentBlock.block.minerpayoutids) {
                 for (let i = 0; i < currentBlock.block.minerpayoutids.length; i++) {
+                    const value = Number.parseInt(currentBlock.block.rawblock.minerpayouts[i].value);
+                    const address = currentBlock.block.rawblock.minerpayouts[i].unlockhash;
                     minerPayouts.push({
                         minerPayoutId: currentBlock.block.minerpayoutids[i],
-                        unlockHash: currentBlock.block.rawblock.minerpayouts[i].unlockhash,
-                        value: Number.parseInt(currentBlock.block.rawblock.minerpayouts[i].value),
+                        unlockHash: address,
+                        value,
                     });
 
-                    minerReward += Number.parseInt(currentBlock.block.rawblock.minerpayouts[i].value);
+                    minerReward += value;
     
-                    await this.checkNewWallet(currentBlock.block.rawblock.minerpayouts[i].unlockhash);
+                    await this.checkNewWallet(address);
+                    await this.addBalance(address, value);
                 }
             }
 
@@ -120,27 +146,28 @@ export class SyncBlockService {
                 if (t.rawtransaction.data.coininputs) {
                     for (let i = 0; i < t.rawtransaction.data.coininputs.length; i++) {
                         const current = t.rawtransaction.data.coininputs[i];
-    
-                        const blockStake = {
+                        const value = Number.parseInt(t.coininputoutputs[i].value);
+                        const inputs = {
                             parentId: current.parentid,
                             address: t.coininputoutputs[i].condition.data.unlockhash,
-                            value: Number.parseInt(t.coininputoutputs[i].value),
+                            value,
                             unlockType: t.coininputoutputs[i].condition.type,
                             publicKey: '',
                             signature: ''
                         };
     
                         if (current.fulfillment) {
-                            blockStake.publicKey = current.fulfillment.data.publickey;
-                            blockStake.signature = current.fulfillment.data.signature;
+                            inputs.publicKey = current.fulfillment.data.publickey;
+                            inputs.signature = current.fulfillment.data.signature;
                         } else if (current.unlocker && current.unlocker.fulfillment) {
-                            blockStake.publicKey = current.unlocker.condition.publickey;
-                            blockStake.signature = current.unlocker.fulfillment.signature;
+                            inputs.publicKey = current.unlocker.condition.publickey;
+                            inputs.signature = current.unlocker.fulfillment.signature;
                         }
     
-                        coinInputs.push(blockStake);
+                        coinInputs.push(inputs);
 
-                        await this.checkNewWallet(blockStake.address);
+                        await this.checkNewWallet(inputs.address);
+                        await this.removeBalance(inputs.address, value);
                     }
                 }
                 
@@ -150,7 +177,6 @@ export class SyncBlockService {
                 if (t.rawtransaction.data.blockstakeoutputs) {
                     for (let i = 0; i < t.rawtransaction.data.blockstakeoutputs.length; i++) {
                         const current = t.rawtransaction.data.blockstakeoutputs[i];
-    
                         blockStakeOutputs.push({
                             id: t.blockstakeoutputids[i],
                             address: current.unlockhash || current.condition.data.unlockhash,
@@ -166,14 +192,17 @@ export class SyncBlockService {
                 if (t.rawtransaction.data.coinoutputs) {
                     for (let i = 0; i < t.rawtransaction.data.coinoutputs.length; i++) {
                         const current = t.rawtransaction.data.coinoutputs[i];
-    
+                        const address = current.unlockhash || current.condition.data.unlockhash || current.condition.data.condition.data.unlockhash;
+                        const value = Number.parseInt(current.value);
+
                         coinOutputs.push({
                             id: t.coinoutputids[i],
-                            address: current.unlockhash || current.condition.data.unlockhash || current.condition.data.condition.data.unlockhash,
-                            value: Number.parseInt(current.value),
+                            address,
+                            value,
                         });
 
-                        await this.checkNewWallet(current.unlockhash || current.condition.data.unlockhash || current.condition.data.condition.data.unlockhash);
+                        await this.checkNewWallet(address);
+                        await this.addBalance(address, value);
                     }
                 }
 
