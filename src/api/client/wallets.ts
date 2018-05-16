@@ -13,8 +13,8 @@ export class Wallets {
 
     getMoreInfo = async (ctx) => {
         const availibleFields = [
-            'coin',
-            'blockStake',
+            'transactions',
+            'blockStakeMotion',
             'minerPayouts',
         ];
 
@@ -42,7 +42,7 @@ export class Wallets {
         const list = [];
         let count = 0;
 
-        if (field === 'coin') {
+        if (field === 'transactions') {
             const txQuery = {
                 $or: [{
                     'coinInputs.address': wallet._id
@@ -137,7 +137,7 @@ export class Wallets {
             }
         }
 
-        if (field === 'blockStake') {
+        if (field === 'blockStakeMotion') {
             const bsQuery = {
                 $or: [{
                     'blockStakeInputs.address': wallet._id
