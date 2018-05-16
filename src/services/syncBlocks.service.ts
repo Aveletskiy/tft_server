@@ -240,17 +240,7 @@ export class SyncBlockService {
 
             await block.save();
 
-            const blockForCache = await Block.findById(block._id).lean();
-            const transactions = await Transaction.find({
-                'blockInfo.height': block.height
-            }).lean();
-
-            const cachedData = {
-                block: blockForCache,
-                transactions
-            }
-
-            this.cache.setField(`block_${block.height}`, cachedData, 30);
+            this.cache.setField(`block_${block.height}`, block, 30);
 
             currentIndex ++;
 
