@@ -68,34 +68,34 @@ export class Wallets {
                     rates: tx.rates
                 }
 
-                const notOut = tx.coinOutputs.find((el) => el.address === wallet._id);
+                // const notOut = tx.coinOutputs.find((el) => el.address === wallet._id);
 
                 if (tx.coinInputCount && tx.coinInputs[0].address === wallet._id) {
                     userTx.isLoading = false;
                 }
 
-                if (tx.coinInputCount && !notOut) {
-                    if (tx.coinInputs[0].address === wallet._id) {
-                        userTx.from = wallet._id;
-                        userTx.coinsInputSumm = tx.coinInputs.reduce((prev, current) => {
-                            return prev + current.value
-                        }, 0);
+                // if (tx.coinInputCount && !notOut) {
+                //     if (tx.coinInputs[0].address === wallet._id) {
+                //         userTx.from = wallet._id;
+                //         userTx.coinsInputSumm = tx.coinInputs.reduce((prev, current) => {
+                //             return prev + current.value
+                //         }, 0);
 
-                        for (const out of tx.coinOutputs) {
-                            if (out.address !== wallet._id) {
-                                userTx.motion.push({
-                                    to: out.address,
-                                    value: out.value
-                                });
+                //         for (const out of tx.coinOutputs) {
+                //             if (out.address !== wallet._id) {
+                //                 userTx.motion.push({
+                //                     to: out.address,
+                //                     value: out.value
+                //                 });
 
-                                userTx.coinsSumm += out.value;
-                            }
+                //                 userTx.coinsSumm += out.value;
+                //             }
 
                             
 
-                        }
-                    }
-                } 
+                //         }
+                //     }
+                // } 
                 
                 if (tx.coinOutputCount) {
                     for (const out of tx.coinOutputs) {

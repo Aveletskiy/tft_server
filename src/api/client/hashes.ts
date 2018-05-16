@@ -73,34 +73,34 @@ export class Hashes {
                         rates: tx.rates
                     }
 
-                    const notOut = tx.coinOutputs.find((el) => el.address === hash);
+                    // const notOut = tx.coinOutputs.find((el) => el.address === hash);
 
                     if (tx.coinInputCount && tx.coinInputs[0].address === hash) {
                         userTx.isLoading = false;
                     }
 
-                    if (tx.coinInputCount && !notOut) {
-                        if (tx.coinInputs[0].address === hash) {
-                            userTx.from = hash;
-                            userTx.coinsInputSumm = tx.coinInputs.reduce((prev, current) => {
-                                return prev + current.value
-                            }, 0);
+                    // if (tx.coinInputCount && !notOut) {
+                    //     if (tx.coinInputs[0].address === hash) {
+                    //         userTx.from = hash;
+                    //         userTx.coinsInputSumm = tx.coinInputs.reduce((prev, current) => {
+                    //             return prev + current.value
+                    //         }, 0);
  
-                            for (const out of tx.coinOutputs) {
-                                if (out.address !== hash) {
-                                    userTx.motion.push({
-                                        to: out.address,
-                                        value: out.value
-                                    });
+                    //         for (const out of tx.coinOutputs) {
+                    //             if (out.address !== hash) {
+                    //                 userTx.motion.push({
+                    //                     to: out.address,
+                    //                     value: out.value
+                    //                 });
 
-                                    userTx.coinsSumm += out.value;
-                                }
+                    //                 userTx.coinsSumm += out.value;
+                    //             }
 
                                 
 
-                            }
-                        }
-                    } 
+                    //         }
+                    //     }
+                    // } 
                     
                     if (tx.coinOutputCount) {
                         for (const out of tx.coinOutputs) {
