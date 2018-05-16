@@ -106,7 +106,8 @@ export class Wallets {
                         if (out.address === wallet._id && userTx.from !== wallet._id) {
                             userTx.motion.push({
                                 to: out.address,
-                                value: out.value
+                                value: out.value,
+                                lockTime: out.lockTime || null,
                             });
 
                             userTx.coinsSumm += out.value;
@@ -115,7 +116,8 @@ export class Wallets {
                         if (out.address !== wallet._id && userTx.from == wallet._id) {
                             userTx.motion.push({
                                 to: out.address,
-                                value: out.value
+                                value: out.value,
+                                lockTime: out.lockTime || null,
                             });
 
                             userTx.coinsSumm += out.value;

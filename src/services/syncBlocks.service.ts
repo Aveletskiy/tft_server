@@ -194,11 +194,17 @@ export class SyncBlockService {
                         const current = t.rawtransaction.data.coinoutputs[i];
                         const address = current.unlockhash || current.condition.data.unlockhash || current.condition.data.condition.data.unlockhash;
                         const value = Number.parseInt(current.value);
+                        let lockTime = null;
+                        
+                        if (current.condition && current.condition.data && current.condition.data.locktime) {
+                            lockTime = current.condition.data.locktime;
+                        }
 
                         coinOutputs.push({
                             id: t.coinoutputids[i],
                             address,
                             value,
+                            lockTime,
                         });
 
                         await this.checkNewWallet(address);

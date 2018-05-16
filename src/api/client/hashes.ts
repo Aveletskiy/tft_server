@@ -111,7 +111,8 @@ export class Hashes {
                             if (out.address === hash && userTx.from !== hash) {
                                 userTx.motion.push({
                                     to: out.address,
-                                    value: out.value
+                                    value: out.value,
+                                    lockTime: out.lockTime || null,
                                 });
 
                                 userTx.coinsSumm += out.value;
@@ -120,7 +121,8 @@ export class Hashes {
                             if (out.address !== hash && userTx.from == hash) {
                                 userTx.motion.push({
                                     to: out.address,
-                                    value: out.value
+                                    value: out.value,
+                                    lockTime: out.lockTime || null,
                                 });
 
                                 userTx.coinsSumm += out.value;

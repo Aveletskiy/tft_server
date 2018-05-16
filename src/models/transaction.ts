@@ -13,6 +13,7 @@ interface IOutputs {
     id: string;
     address: string;
     value: number;
+    lockTime: number;
 }
 
 interface IBlockInfo {
@@ -90,6 +91,7 @@ const schema = new Schema({
         id: String,
         address: String,
         value: Number,
+        lockTime: Number,
     }],
     
     minerFees: [],
