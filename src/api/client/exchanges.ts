@@ -36,6 +36,8 @@ export class Exchanges {
                     averagePriceLow: { $avg: '$low' },
                     averagePriceHigh: { $avg: '$high' },
                 }
+            }, {
+                $sort : { createdAt : 1,}
             }
         ]);
 
