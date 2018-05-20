@@ -11,4 +11,10 @@ export class Curency {
         const coinPrice = await this.currencyService.getCoinPrice('BTC');
         const euroRate = await this.currencyService.getEuroRate('USD');
     }
+
+    updateBtcAlphaInfo = async () => {
+        await this.currencyService.getBtcAlphaPrice('TFT_BTC');
+        await this.currencyService.getBtcAlphaPrice('TFT_USD');
+        this.currencyService.calculateAverageTFTPrice();
+    }
 }

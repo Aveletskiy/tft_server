@@ -65,7 +65,7 @@ export class SyncBlockService {
 
         while (currentIndex <= maxBlockHeight) {
             const currentBlock = await this.tftService.getBlockById(currentIndex);
-            const { coinPrice, currencyRate } = await this.currencyService.getLastInfo('BTC', 'USD');
+            const { coinPrice, currencyRate, tftPrice } = await this.currencyService.getLastInfo('BTC', 'USD', ['TFT_BTC', 'TFT_USD']);
             const minerPayouts = [];
 
 
@@ -100,7 +100,8 @@ export class SyncBlockService {
                 minerPayouts,
                 rates: {
                     btcUsd: coinPrice,
-                    usdEur: currencyRate
+                    usdEur: currencyRate,
+                    tftPrice
                 },
             });
 
@@ -231,7 +232,8 @@ export class SyncBlockService {
                     minerFees: t.rawtransaction.data.minerfees,
                     rates: {
                         btcUsd: coinPrice,
-                        usdEur: currencyRate
+                        usdEur: currencyRate,
+                        tftPrice
                     },
                 });
 

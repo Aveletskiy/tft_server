@@ -219,6 +219,6 @@ export class Hashes {
             data: result
         }
 
-        // this.cache.setField(`hash_${ctx.params.hash}`, result, 300);
+        this.cache.setField(`hash_${ctx.params.hash}`, result, 500);
     }
 }

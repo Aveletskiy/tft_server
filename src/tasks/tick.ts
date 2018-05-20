@@ -28,7 +28,7 @@ export class Tick {
             return;
         }
 
-        const { coinPrice, currencyRate } = await this.currencyService.getLastInfo('BTC', 'USD');
+        const { coinPrice, currencyRate, tftPrice } = await this.currencyService.getLastInfo('BTC', 'USD', ['TFT_BTC', 'TFT_USD']);
         const minerReward = current.rawblock.minerpayouts.reduce((prev, current) => {
             return prev + Number.parseInt(current.value);
         }, 0);
@@ -63,7 +63,8 @@ export class Tick {
                 },
                 currency: {
                     btcUsd: coinPrice,
-                    usdEur: currencyRate
+                    usdEur: currencyRate,
+                    tftPrice
                 },
                 maxSuply: maxSuply.value
             })

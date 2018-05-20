@@ -43,7 +43,7 @@ export class Blocks {
             };
         }
 
-        const { coinPrice, currencyRate } = await this.currencyService.getLastInfo('BTC', 'USD');
+        const { coinPrice, currencyRate, tftPrice } = await this.currencyService.getLastInfo('BTC', 'USD', ['TFT_BTC', 'TFT_USD']);
 
         ctx.body = {
             result: true,
@@ -58,7 +58,8 @@ export class Blocks {
                 lastBlocks: last10,
                 currency: {
                     btcUsd: coinPrice,
-                    usdEur: currencyRate
+                    usdEur: currencyRate,
+                    tftPrice,
                 },
                 maxSuply: maxSuply.value,
             }
@@ -148,7 +149,6 @@ export class Blocks {
     }
 
     calculateMaxSuply = async () => {
-        console.log('calculateMaxSuply');
         const stats = await Block.aggregate([{
             $group: {
                 _id : null,
@@ -156,6 +156,9 @@ export class Blocks {
             },
         }]);
 
-        return stats[0].maxSuply;
+        const genesisBlockTxs = await Transaction.findOne({'blockInfo.height': 0}).lean();
+        const genesisSuply = genesisBlockTxs.coinOutputs.reduce((prev, curr) => prev + curr.value, 0);
+
+        return stats[0].maxSuply + genesisSuply;
     }
 }

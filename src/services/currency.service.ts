@@ -1,3 +1,5 @@
+import * as Exchange from '../models/exchange';
+
 let instance = null;
 
 export class CurrencyService {
@@ -11,7 +13,8 @@ export class CurrencyService {
             this.parser = require('xml-parser');
             this.lastInfo = {
                 coinPrice: {},
-                euroRate: {}
+                euroRate: {},
+                tftPrice: {},
             }
 
             instance = this;
@@ -38,7 +41,7 @@ export class CurrencyService {
 
             const coinPrice = prices.find(el => el.symbol === coin);
 
-            this.lastInfo.coinPrice['coin'] = Number.parseFloat(coinPrice.price_usd) || 0;
+            this.lastInfo.coinPrice[coin] = Number.parseFloat(coinPrice.price_usd) || 0;
 
             return Number.parseFloat(coinPrice.price_usd) || 0;
         } catch (e) {
@@ -76,11 +79,11 @@ export class CurrencyService {
         }
     }
 
-    getLastInfo = async (coin: string, currency: string) => {
-        let coinPrice = this.lastInfo.coinPrice['coin'];
+    getLastInfo = async (coin: string, currency: string, exchangePairs: any) => {
+        let coinPrice = this.lastInfo.coinPrice[coin];
         if (!coinPrice) {
             coinPrice = await this.getCoinPrice(coin);
-            this.lastInfo.coinPrice['coin'] = coinPrice;
+            this.lastInfo.coinPrice[coin] = coinPrice;
         }
 
         let currencyRate = this.lastInfo.euroRate[currency];
@@ -89,10 +92,97 @@ export class CurrencyService {
             this.lastInfo.euroRate[currency] = currencyRate;
         }
 
+        let tftPrice = this.lastInfo.tftPrice;
+
+        if (Object.keys(tftPrice).length < exchangePairs.length) {
+            for (const pair of exchangePairs) {
+                await this.getBtcAlphaPrice(pair);
+            }
+            this.calculateAverageTFTPrice();
+            tftPrice = this.lastInfo.tftPrice;
+        }
+        
         return {
             coinPrice,
-            currencyRate
+            currencyRate,
+            tftPrice
         }
+    }
+
+    calculateAverageTFTPrice = async () => {
+        delete this.lastInfo.tftPrice['averagePrice'];
+
+        let low = 0;
+        let high = 0;
+        let count = Object.keys(this.lastInfo.tftPrice).length;
+
+        for (const key in this.lastInfo.tftPrice) {
+            if (this.lastInfo.tftPrice.hasOwnProperty(key)) {
+                if (key.includes('USD')) {
+                    low += this.lastInfo.tftPrice[key].low * this.lastInfo.tftPrice[key].volume;
+                    high += this.lastInfo.tftPrice[key].high * this.lastInfo.tftPrice[key].volume;
+                } else {
+                    const coin = key.split('_')[1];
+                    const rate = this.lastInfo.coinPrice[coin];
+                    low += this.lastInfo.tftPrice[key].low * rate * this.lastInfo.tftPrice[key].volume;
+                    high += this.lastInfo.tftPrice[key].high * rate * this.lastInfo.tftPrice[key].volume;
+                }
+            }
+        }
+
+        this.lastInfo.tftPrice['averagePrice'] = {
+            low: low / count,
+            high: high / count,
+        };
+    }
+
+    getBtcAlphaPrice = async (pair: String) => {
+        try {
+            const rates = await new Promise((resolve, reject) => {
+                this.request.get(`https://btc-alpha.com/api/charts/${pair}/15/chart/?format=json&limit=1`, {}, (err, response, body) => {
+                    if (err) {
+                        resolve([]);
+                    } else {
+                        try {
+                            resolve(JSON.parse(body));
+                        } catch (e) {
+                            resolve([]);
+                        }
+                    };
+                });
+            }) as any;
+    
+            for (const rate of rates) {
+                const exist = await Exchange.findOne({
+                    time: rate.time,
+                    pair,
+                }).lean();
+    
+                if (exist) {
+                    continue;
+                }
+                
+                await new Exchange({
+                    ...rate,
+                    pair,
+                    tradeName: 'btc-alpha.com'
+                }).save();
+            }
+
+            const last = await Exchange.findOne({pair}).sort('-time').lean();
+            
+            if (last) {
+                this.lastInfo.tftPrice[`${pair}`] = {
+                    low: last.low,
+                    high: last.high,
+                    volume: last.volume,
+                };
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        
+        return;
     }
 
 }
