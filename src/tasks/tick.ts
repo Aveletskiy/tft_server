@@ -34,18 +34,18 @@ export class Tick {
         }, 0);
 
         try {
-            let maxSuply = await this.cache.getField(`maxSuply`);
-            if (maxSuply && maxSuply.height < current.height) {
-                const value = maxSuply.value + minerReward;
-                maxSuply = {
+            let totalSupply = await this.cache.getField(`totalSupply`);
+            if (totalSupply && totalSupply.height < current.height) {
+                const value = totalSupply.value + minerReward;
+                totalSupply = {
                     value,
                     height: current.height
                 };
-                this.cache.setField(`maxSuply`, maxSuply);
+                this.cache.setField(`totalSupply`, totalSupply);
             }
 
-            if (!maxSuply) {
-                maxSuply = {
+            if (!totalSupply) {
+                totalSupply = {
                     value: 0,
                 };
             }
@@ -66,7 +66,7 @@ export class Tick {
                     usdEur: currencyRate,
                     tftPrice
                 },
-                maxSuply: maxSuply.value
+                totalSupply: totalSupply.value
             })
 
             if (this.syncedBlock !== current.height) {

@@ -27,13 +27,13 @@ export class Blocks {
             this.cache.setField(`lastBlocks`, last10, 300)
         }
 
-        let maxSuply = await this.cache.getField(`maxSuply`);
-        if (!maxSuply) {
-            maxSuply = {
-                value: await this.calculateMaxSuply(),
+        let totalSupply = await this.cache.getField(`totalSupply`);
+        if (!totalSupply) {
+            totalSupply = {
+                value: await this.calculateTotalSupply(),
                 height: main.height
             };
-            this.cache.setField(`maxSuply`, maxSuply);
+            this.cache.setField(`totalSupply`, totalSupply);
         }
 
         if (!main || !last10 || !last10.length) {
@@ -61,7 +61,7 @@ export class Blocks {
                     usdEur: currencyRate,
                     tftPrice,
                 },
-                maxSuply: maxSuply.value,
+                totalSupply: totalSupply.value,
             }
         }
     }
@@ -148,17 +148,17 @@ export class Blocks {
         this.cache.setField(`block_${id}`, block, 30);
     }
 
-    calculateMaxSuply = async () => {
+    calculateTotalSupply = async () => {
         const stats = await Block.aggregate([{
             $group: {
                 _id : null,
-                maxSuply: { $sum: '$minerReward' },
+                totalSupply: { $sum: '$minerReward' },
             },
         }]);
 
         const genesisBlockTxs = await Transaction.findOne({'blockInfo.height': 0}).lean();
         const genesisSuply = genesisBlockTxs.coinOutputs.reduce((prev, curr) => prev + curr.value, 0);
 
-        return stats[0].maxSuply + genesisSuply;
+        return stats[0].totalSupply + genesisSuply;
     }
 }
