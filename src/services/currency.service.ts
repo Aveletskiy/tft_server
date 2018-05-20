@@ -159,7 +159,6 @@ export class CurrencyService {
             for (const rate of rates) {
                 const exist = await Exchange.findOne({
                     time: rate.time,
-                    dateOfMonth: new Date().getDate(),
                     pair,
                 }).lean();
     
@@ -169,6 +168,7 @@ export class CurrencyService {
                 
                 await new Exchange({
                     ...rate,
+                    dateOfMonth: new Date().getDate(),
                     pair,
                     tradeName: 'btc-alpha.com'
                 }).save();
