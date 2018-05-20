@@ -15,6 +15,6 @@ export class Curency {
     updateBtcAlphaInfo = async () => {
         await this.currencyService.getBtcAlphaPrice('TFT_BTC');
         await this.currencyService.getBtcAlphaPrice('TFT_USD');
-        this.currencyService.calculateAverageTFTPrice();
+        this.currencyService.calculateWeightedAverageTFTPrice();
     }
 }

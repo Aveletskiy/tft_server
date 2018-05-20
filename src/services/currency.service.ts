@@ -98,7 +98,7 @@ export class CurrencyService {
             for (const pair of exchangePairs) {
                 await this.getBtcAlphaPrice(pair);
             }
-            this.calculateAverageTFTPrice();
+            this.calculateWeightedAverageTFTPrice();
             tftPrice = this.lastInfo.tftPrice;
         }
         
@@ -109,7 +109,7 @@ export class CurrencyService {
         }
     }
 
-    calculateAverageTFTPrice = async () => {
+    calculateWeightedAverageTFTPrice = async () => {
         delete this.lastInfo.tftPrice['averagePrice'];
 
         let low = 0;
@@ -130,7 +130,7 @@ export class CurrencyService {
             }
         }
 
-        this.lastInfo.tftPrice['averagePrice'] = {
+        this.lastInfo.tftPrice['weightedAveragePrice'] = {
             low: low / count,
             high: high / count,
         };
