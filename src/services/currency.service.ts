@@ -16,10 +16,7 @@ export class CurrencyService {
                 euroRate: {},
                 tftPrice: {
                     pairs: {},
-                    weightedAveragePrice: {
-                        low: 0,
-                        high: 0,
-                    },
+                    weightedAveragePrice: 0,
                 },
             }
 
@@ -116,28 +113,22 @@ export class CurrencyService {
     }
 
     calculateWeightedAverageTFTPrice = async () => {
-        let low = 0;
-        let high = 0;
+        let result = 0
         let count = Object.keys(this.lastInfo.tftPrice.pairs).length;
 
         for (const key in this.lastInfo.tftPrice.pairs) {
             if (this.lastInfo.tftPrice.pairs.hasOwnProperty(key)) {
                 if (key.includes('USD')) {
-                    low += this.lastInfo.tftPrice.pairs[key].low * this.lastInfo.tftPrice.pairs[key].volume;
-                    high += this.lastInfo.tftPrice.pairs[key].high * this.lastInfo.tftPrice.pairs[key].volume;
+                    result += this.lastInfo.tftPrice.pairs[key].price * this.lastInfo.tftPrice.pairs[key].volume;
                 } else {
                     const coin = key.split('_')[1];
                     const rate = this.lastInfo.coinPrice[coin];
-                    low += this.lastInfo.tftPrice.pairs[key].low * rate * this.lastInfo.tftPrice.pairs[key].volume;
-                    high += this.lastInfo.tftPrice.pairs[key].high * rate * this.lastInfo.tftPrice.pairs[key].volume;
+                    result += this.lastInfo.tftPrice.pairs[key].price * rate * this.lastInfo.tftPrice.pairs[key].volume;
                 }
             }
         }
 
-        this.lastInfo.tftPrice.weightedAveragePrice = {
-            low: low / count,
-            high: high / count,
-        };
+        this.lastInfo.tftPrice.weightedAveragePrice = result / count;
     }
 
     getBtcAlphaPrice = async (pair: String) => {
