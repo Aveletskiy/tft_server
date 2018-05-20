@@ -110,7 +110,7 @@ export class CurrencyService {
     }
 
     calculateWeightedAverageTFTPrice = async () => {
-        delete this.lastInfo.tftPrice['averagePrice'];
+        delete this.lastInfo.tftPrice['weightedAveragePrice'];
 
         let low = 0;
         let high = 0;
