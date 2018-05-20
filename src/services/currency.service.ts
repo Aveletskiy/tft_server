@@ -14,7 +14,13 @@ export class CurrencyService {
             this.lastInfo = {
                 coinPrice: {},
                 euroRate: {},
-                tftPrice: {},
+                tftPrice: {
+                    pairs: {},
+                    weightedAveragePrice: {
+                        low: 0,
+                        high: 0,
+                    },
+                },
             }
 
             instance = this;
@@ -94,7 +100,7 @@ export class CurrencyService {
 
         let tftPrice = this.lastInfo.tftPrice;
 
-        if (Object.keys(tftPrice).length < exchangePairs.length) {
+        if (Object.keys(tftPrice.pairs).length < exchangePairs.length) {
             for (const pair of exchangePairs) {
                 await this.getBtcAlphaPrice(pair);
             }
@@ -110,27 +116,25 @@ export class CurrencyService {
     }
 
     calculateWeightedAverageTFTPrice = async () => {
-        delete this.lastInfo.tftPrice['weightedAveragePrice'];
-
         let low = 0;
         let high = 0;
-        let count = Object.keys(this.lastInfo.tftPrice).length;
+        let count = Object.keys(this.lastInfo.tftPrice.pairs).length;
 
-        for (const key in this.lastInfo.tftPrice) {
-            if (this.lastInfo.tftPrice.hasOwnProperty(key)) {
+        for (const key in this.lastInfo.tftPrice.pairs) {
+            if (this.lastInfo.tftPrice.pairs.hasOwnProperty(key)) {
                 if (key.includes('USD')) {
-                    low += this.lastInfo.tftPrice[key].low * this.lastInfo.tftPrice[key].volume;
-                    high += this.lastInfo.tftPrice[key].high * this.lastInfo.tftPrice[key].volume;
+                    low += this.lastInfo.tftPrice.pairs[key].low * this.lastInfo.tftPrice.pairs[key].volume;
+                    high += this.lastInfo.tftPrice.pairs[key].high * this.lastInfo.tftPrice.pairs[key].volume;
                 } else {
                     const coin = key.split('_')[1];
                     const rate = this.lastInfo.coinPrice[coin];
-                    low += this.lastInfo.tftPrice[key].low * rate * this.lastInfo.tftPrice[key].volume;
-                    high += this.lastInfo.tftPrice[key].high * rate * this.lastInfo.tftPrice[key].volume;
+                    low += this.lastInfo.tftPrice.pairs[key].low * rate * this.lastInfo.tftPrice.pairs[key].volume;
+                    high += this.lastInfo.tftPrice.pairs[key].high * rate * this.lastInfo.tftPrice.pairs[key].volume;
                 }
             }
         }
 
-        this.lastInfo.tftPrice['weightedAveragePrice'] = {
+        this.lastInfo.tftPrice.weightedAveragePrice = {
             low: low / count,
             high: high / count,
         };
@@ -172,7 +176,7 @@ export class CurrencyService {
             const last = await Exchange.findOne({pair}).sort('-time').lean();
             
             if (last) {
-                this.lastInfo.tftPrice[`${pair}`] = {
+                this.lastInfo.tftPrice.pairs[`${pair}`] = {
                     low: last.low,
                     high: last.high,
                     volume: last.volume,
