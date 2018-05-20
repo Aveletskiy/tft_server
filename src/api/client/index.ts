@@ -17,7 +17,7 @@ const exchanges = new Exchanges()
 
 router
     // BLOCKS
-    .get('/block', block.getLastInfo)
+    .get('/', block.getLastInfo)
 
     .get('/block/:id', block.getByHeight)
     .get('/block/:id/transactions', block.getBlockTransactions)
