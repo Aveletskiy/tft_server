@@ -11,6 +11,7 @@ interface IExchange {
     volume: number;
     pair: string;
     createdAt: Date;
+    dateOfMonth: number;
 }
 
 const schema = new Schema({
@@ -27,6 +28,7 @@ const schema = new Schema({
     high: Number,
     volume: Number,
     pair: String,
+    dateOfMonth: Number,
 
     createdAt: {
         type: Date,
