@@ -135,7 +135,9 @@ export class CurrencyService {
     getBtcAlphaPrice = async (pair: String) => {
         try {
             const rates = await new Promise((resolve, reject) => {
-                this.request.get(`https://btc-alpha.com/api/charts/${pair}/15/chart/?format=json&limit=1`, {}, (err, response, body) => {
+                const now = Math.round(new Date().getTime() / 1000);
+                const since = now - 86400; //1526894938;
+                this.request.get(`https://btc-alpha.com/api/charts/${pair}/15/chart/?format=json&since=${since}`, {}, (err, response, body) => {
                     if (err) {
                         resolve([]);
                     } else {
@@ -171,7 +173,10 @@ export class CurrencyService {
             if (last) {
                 this.lastInfo.tftPrice.pairs[`${pair}`] = {
                     price: (last.low + last.high) / 2,
-                    volume: last.volume,
+                    currentVolume: last.volume,
+                    volume: rates.reduce((prev, curr) => {
+                        return prev + curr.volume
+                    }, 0),
                 };
             }
         } catch (e) {
