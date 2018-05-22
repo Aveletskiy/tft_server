@@ -1,7 +1,6 @@
 deploy_dev:
   script:
     - pwd
-    - cat ~/.ssh/id_rsa.pub
     - rsync -a ./ --exclude '.git' root@5.45.120.191:/root/servers/tft
     - ssh -i ~/.ssh/id_rsa root@5.45.120.191 -t "/root/scripts/deploy-tft-server.bash"
   only:
