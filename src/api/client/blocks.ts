@@ -27,13 +27,13 @@ export class Blocks {
             this.cache.setField(`lastBlocks`, last10, 300)
         }
 
-        let maxSuply = await this.cache.getField(`maxSuply`);
-        if (!maxSuply) {
-            maxSuply = {
-                value: await this.calculateMaxSuply(),
+        let totalSupply = await this.cache.getField(`totalSupply`);
+        if (!totalSupply) {
+            totalSupply = {
+                value: await this.calculateTotalSupply(),
                 height: main.height
             };
-            this.cache.setField(`maxSuply`, maxSuply);
+            this.cache.setField(`totalSupply`, totalSupply);
         }
 
         if (!main || !last10 || !last10.length) {
@@ -43,7 +43,7 @@ export class Blocks {
             };
         }
 
-        const { coinPrice, currencyRate } = await this.currencyService.getLastInfo('BTC', 'USD');
+        const { coinPrice, currencyRate, tftPrice } = await this.currencyService.getLastInfo('BTC', 'USD', ['TFT_BTC', 'TFT_USD']);
 
         ctx.body = {
             result: true,
@@ -58,9 +58,10 @@ export class Blocks {
                 lastBlocks: last10,
                 currency: {
                     btcUsd: coinPrice,
-                    usdEur: currencyRate
+                    usdEur: currencyRate,
+                    tftPrice,
                 },
-                maxSuply: maxSuply.value,
+                totalSupply: totalSupply.value,
             }
         }
     }
@@ -147,15 +148,17 @@ export class Blocks {
         this.cache.setField(`block_${id}`, block, 30);
     }
 
-    calculateMaxSuply = async () => {
-        console.log('calculateMaxSuply');
+    calculateTotalSupply = async () => {
         const stats = await Block.aggregate([{
             $group: {
                 _id : null,
-                maxSuply: { $sum: '$minerReward' },
+                totalSupply: { $sum: '$minerReward' },
             },
         }]);
 
-        return stats[0].maxSuply;
+        const genesisBlockTxs = await Transaction.findOne({'blockInfo.height': 0}).lean();
+        const genesisSuply = genesisBlockTxs.coinOutputs.reduce((prev, curr) => prev + curr.value, 0);
+
+        return stats[0].totalSupply + genesisSuply;
     }
 }

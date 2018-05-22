@@ -28,24 +28,24 @@ export class Tick {
             return;
         }
 
-        const { coinPrice, currencyRate } = await this.currencyService.getLastInfo('BTC', 'USD');
+        const { coinPrice, currencyRate, tftPrice } = await this.currencyService.getLastInfo('BTC', 'USD', ['TFT_BTC', 'TFT_USD']);
         const minerReward = current.rawblock.minerpayouts.reduce((prev, current) => {
             return prev + Number.parseInt(current.value);
         }, 0);
 
         try {
-            let maxSuply = await this.cache.getField(`maxSuply`);
-            if (maxSuply && maxSuply.height < current.height) {
-                const value = maxSuply.value + minerReward;
-                maxSuply = {
+            let totalSupply = await this.cache.getField(`totalSupply`);
+            if (totalSupply && totalSupply.height < current.height) {
+                const value = totalSupply.value + minerReward;
+                totalSupply = {
                     value,
                     height: current.height
                 };
-                this.cache.setField(`maxSuply`, maxSuply);
+                this.cache.setField(`totalSupply`, totalSupply);
             }
 
-            if (!maxSuply) {
-                maxSuply = {
+            if (!totalSupply) {
+                totalSupply = {
                     value: 0,
                 };
             }
@@ -63,9 +63,10 @@ export class Tick {
                 },
                 currency: {
                     btcUsd: coinPrice,
-                    usdEur: currencyRate
+                    usdEur: currencyRate,
+                    tftPrice
                 },
-                maxSuply: maxSuply.value
+                totalSupply: totalSupply.value
             })
 
             if (this.syncedBlock !== current.height) {

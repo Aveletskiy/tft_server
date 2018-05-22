@@ -31,6 +31,10 @@ export class Tasks {
             this.currency.updateCurrencyInfo();
         });
 
+        cron.schedule('* * * * *', () => {
+            this.currency.updateBtcAlphaInfo();
+        });
+
         if (process.env.NODE_ENV === 'dev') {
             console.log(chalk.white.bgBlue.bold('[tasks] Задача обновления курсов запущена'));
         }

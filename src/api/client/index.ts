@@ -6,16 +6,18 @@ import { Hashes } from './hashes';
 import { Peers } from './peers';
 import { Transactions } from './transactions';
 import { Wallets } from './wallets';
+import { Exchanges } from './exchanges';
 
 const block = new Blocks();
 const hashes = new Hashes();
 const peers = new Peers();
 const transactions = new Transactions();
 const wallets = new Wallets();
+const exchanges = new Exchanges()
 
 router
     // BLOCKS
-    .get('/block', block.getLastInfo)
+    .get('/', block.getLastInfo)
 
     .get('/block/:id', block.getByHeight)
     .get('/block/:id/transactions', block.getBlockTransactions)
@@ -35,6 +37,10 @@ router
 
     // PEERS
     .get('/peers', peers.listPeers)
+    // -----------------------------------------------
+
+    // EXCHANGES
+    .get('/exchanges/month', exchanges.averageRateByMonth)
     // -----------------------------------------------
 
     ;
