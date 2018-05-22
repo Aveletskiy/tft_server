@@ -114,7 +114,7 @@ export class CurrencyService {
 
     calculateWeightedAverageTFTPrice = async () => {
         let result = 0
-        let count = Object.keys(this.lastInfo.tftPrice.pairs).length;
+        let volume = 0;
 
         for (const key in this.lastInfo.tftPrice.pairs) {
             if (this.lastInfo.tftPrice.pairs.hasOwnProperty(key)) {
@@ -125,10 +125,11 @@ export class CurrencyService {
                     const rate = this.lastInfo.coinPrice[coin];
                     result += this.lastInfo.tftPrice.pairs[key].price * rate * this.lastInfo.tftPrice.pairs[key].volume;
                 }
+                volume += this.lastInfo.tftPrice.pairs[key].volume;
             }
         }
 
-        this.lastInfo.tftPrice.weightedAveragePrice = result / count;
+        this.lastInfo.tftPrice.weightedAveragePrice = result / volume;
     }
 
     getBtcAlphaPrice = async (pair: String) => {
