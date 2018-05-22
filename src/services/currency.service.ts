@@ -172,7 +172,7 @@ export class CurrencyService {
             
             if (last) {
                 this.lastInfo.tftPrice.pairs[`${pair}`] = {
-                    price: (last.low + last.high) / 2,
+                    price: last.close,
                     currentVolume: last.volume,
                     volume: rates.reduce((prev, curr) => {
                         return prev + curr.volume
