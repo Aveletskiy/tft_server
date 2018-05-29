@@ -119,7 +119,8 @@ export class CurrencyService {
         for (const key in this.lastInfo.tftPrice.pairs) {
             if (this.lastInfo.tftPrice.pairs.hasOwnProperty(key)) {
                 if (key.includes('USD')) {
-                    result += this.lastInfo.tftPrice.pairs[key].price * this.lastInfo.tftPrice.pairs[key].volume;
+                    result += this.lastInfo.tftPrice.pairs[key].price
+                        * (this.lastInfo.tftPrice.pairs[key].volume || this.lastInfo.tftPrice.pairs[key].currentVolume);
                 } else {
                     const coin = key.split('_')[1];
                     const rate = this.lastInfo.coinPrice[coin];
