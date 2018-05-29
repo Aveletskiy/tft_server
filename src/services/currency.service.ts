@@ -127,9 +127,12 @@ export class CurrencyService {
                     result += this.lastInfo.tftPrice.pairs[key].price * rate
                        * (this.lastInfo.tftPrice.pairs[key].volume || this.lastInfo.tftPrice.pairs[key].currentVolume);
                 }
-                volume += this.lastInfo.tftPrice.pairs[key].volume;
+
+                volume += this.lastInfo.tftPrice.pairs[key].volume || this.lastInfo.tftPrice.pairs[key].currentVolume;
             }
         }
+
+        console.log('WeightedAverage', result, volume);
 
         this.lastInfo.tftPrice.weightedAveragePrice = result / volume;
     }
