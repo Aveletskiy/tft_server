@@ -123,7 +123,8 @@ export class CurrencyService {
                 } else {
                     const coin = key.split('_')[1];
                     const rate = this.lastInfo.coinPrice[coin];
-                    result += this.lastInfo.tftPrice.pairs[key].price * rate * this.lastInfo.tftPrice.pairs[key].volume;
+                    result += this.lastInfo.tftPrice.pairs[key].price * rate
+                       * (this.lastInfo.tftPrice.pairs[key].volume || this.lastInfo.tftPrice.pairs[key].currentVolume);
                 }
                 volume += this.lastInfo.tftPrice.pairs[key].volume;
             }
