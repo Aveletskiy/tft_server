@@ -114,7 +114,7 @@ export class CurrencyService {
 
     calculateWeightedAverageTFTPrice = async () => {
         let result = 0
-        let count = Object.keys(this.lastInfo.tftPrice.pairs).length;
+        let volume = 0;
 
         for (const key in this.lastInfo.tftPrice.pairs) {
             if (this.lastInfo.tftPrice.pairs.hasOwnProperty(key)) {
@@ -126,16 +126,19 @@ export class CurrencyService {
                     result += this.lastInfo.tftPrice.pairs[key].price * rate
                        * (this.lastInfo.tftPrice.pairs[key].volume || this.lastInfo.tftPrice.pairs[key].currentVolume);
                 }
+                volume += this.lastInfo.tftPrice.pairs[key].volume;
             }
         }
 
-        this.lastInfo.tftPrice.weightedAveragePrice = result / count;
+        this.lastInfo.tftPrice.weightedAveragePrice = result / volume;
     }
 
     getBtcAlphaPrice = async (pair: String) => {
         try {
             const rates = await new Promise((resolve, reject) => {
-                this.request.get(`https://btc-alpha.com/api/charts/${pair}/15/chart/?format=json&limit=1`, {}, (err, response, body) => {
+                const now = Math.round(new Date().getTime() / 1000);
+                const since = now - 86400; //1526894938;
+                this.request.get(`https://btc-alpha.com/api/charts/${pair}/15/chart/?format=json&since=${since}`, {}, (err, response, body) => {
                     if (err) {
                         resolve([]);
                     } else {
@@ -170,8 +173,11 @@ export class CurrencyService {
             
             if (last) {
                 this.lastInfo.tftPrice.pairs[`${pair}`] = {
-                    price: (last.low + last.high) / 2,
-                    volume: last.volume,
+                    price: last.close,
+                    currentVolume: last.volume,
+                    volume: rates.reduce((prev, curr) => {
+                        return prev + curr.volume
+                    }, 0),
                 };
             }
         } catch (e) {

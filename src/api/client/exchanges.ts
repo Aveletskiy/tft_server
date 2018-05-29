@@ -37,11 +37,16 @@ export class Exchanges {
                     averagePriceHigh: { $avg: '$high' },
                 }
             }, {
-                $sort : { createdAt : 1}
+                $sort: {
+                    createdAt: 1
+                }
             }
         ]);
 
-        for (const item of avg) {
+        const sorted = avg.sort((a, b) => a._id.month - b._id.month)
+            .sort((a, b) => a._id.year - b._id.year).slice(0, 6);
+
+        for (const item of sorted) {
             result.push({
                 name: `${this.perfectDate(item._id.day)}/${this.perfectDate(item._id.month)}`,
                 value: (item.averagePriceLow + item.averagePriceHigh) / 2,
