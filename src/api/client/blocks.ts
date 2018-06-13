@@ -4,6 +4,7 @@ import { CacheService } from '../../services/cache.service';
 
 import * as Block from '../../models/block';
 import * as Transaction from '../../models/transaction';
+import * as Unit from '../../models/unit';
 
 
 export class Blocks {
@@ -45,23 +46,34 @@ export class Blocks {
 
         const { coinPrice, currencyRate, tftPrice } = await this.currencyService.getLastInfo('BTC', 'USD', ['TFT_BTC', 'TFT_USD']);
 
+        const UnitInfo = await Unit.findOne({});
+
         ctx.body = {
             result: true,
             data: {
-                lastBlock: {
-                    _id: main.blockid,
-                    height: main.height,
-                    difficulty: main.difficulty,
-                    timeStamp: main.maturitytimestamp,
-                    activeBlockStake: main.estimatedactivebs
-                },
-                lastBlocks: last10,
-                currency: {
-                    btcUsd: coinPrice,
-                    usdEur: currencyRate,
-                    tftPrice,
-                },
-                totalSupply: totalSupply.value,
+              lastBlock: {
+                _id: main.blockid,
+                height: main.height,
+                difficulty: main.difficulty,
+                timeStamp: main.maturitytimestamp,
+                activeBlockStake: main.estimatedactivebs
+              },
+              lastBlocks: last10,
+              currency: {
+                btcUsd: coinPrice,
+                usdEur: currencyRate,
+                tftPrice,
+              },
+              totalSupply: totalSupply.value,
+              computeUnitsTotal: UnitInfo.computeUnitsTotal,
+              storageUnitsTotal: UnitInfo.storageUnitsTotal,
+              storageUnitsTB: UnitInfo.storageUnitsTB,
+              storageUnitsCores: UnitInfo.storageUnitsCores,
+              computeUnitPriceUSD: UnitInfo.computeUnitPriceUSD,
+              storageUnitPriceUSD: UnitInfo.storageUnitPriceUSD,
+              maxSupply: UnitInfo.maxSupply,
+              computeUnitPrice: UnitInfo.computeUnitPrice,
+              storageUnitPrice: UnitInfo.storageUnitPrice,
             }
         }
     }
@@ -72,7 +84,7 @@ export class Blocks {
             return ctx.body = {
                 result: false,
                 message: 'Invalid block id',
-            } 
+            }
         }
 
         let limit = ctx.query.limit || 5;
@@ -93,7 +105,7 @@ export class Blocks {
         const transactions = await Transaction.find({
             'blockInfo.height': id
         }).lean();
-        
+
         for (const tx of transactions) {
             delete tx.blockStakeInputs;
             delete tx.blockStakeOutputs;
@@ -119,7 +131,7 @@ export class Blocks {
             return ctx.body = {
                 result: false,
                 message: 'Invalid block id',
-            } 
+            }
         }
 
         const cachedData = await this.cache.getField(`block_${id}`);
