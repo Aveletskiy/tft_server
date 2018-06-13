@@ -46,7 +46,12 @@ export class Blocks {
 
     const {coinPrice, currencyRate, tftPrice} = await this.currencyService.getLastInfo('BTC', 'USD', ['TFT_BTC', 'TFT_USD']);
 
-    const UnitInfo = await Unit.findOne({});
+    let UnitInfo = await Unit.findOne({});
+    if (!UnitInfo) {
+      const unit = new Unit();
+      await unit.save();
+      UnitInfo = await Unit.findOne({});
+    }
 
     ctx.body = {
       result: true,
