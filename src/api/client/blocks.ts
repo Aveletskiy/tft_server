@@ -49,7 +49,7 @@ export class Blocks {
     let UnitInfo = await Unit.findOne({});
     if (!UnitInfo) {
       const unit = new Unit();
-      await unit.save();
+      await unit.save({_id: 1});
       UnitInfo = await Unit.findOne({});
     }
 
