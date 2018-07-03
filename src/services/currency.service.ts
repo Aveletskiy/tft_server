@@ -1,8 +1,6 @@
 import * as Exchange from '../models/exchange';
 import * as Currency from '../models/currency';
 
-import {Query, mongoose} from 'mongoose';
-
 let instance = null;
 
 export class CurrencyService {
@@ -23,7 +21,7 @@ export class CurrencyService {
           pairs: {},
           weightedAveragePrice: 0,
         },
-      }
+      };
 
       instance = this;
     }
@@ -44,7 +42,6 @@ export class CurrencyService {
               resolve([]);
             }
           }
-          ;
         });
       }) as any;
 
@@ -57,7 +54,7 @@ export class CurrencyService {
       console.error(e);
       return 0;
     }
-  }
+  };
 
   getEuroRate = async (currency: string) => {
     try {
@@ -87,7 +84,7 @@ export class CurrencyService {
       console.error(e);
       return 0;
     }
-  }
+  };
 
   getLastInfo = async (coin: string, currency: string, exchangePairs: any) => {
     let coinPrice = this.lastInfo.coinPrice[coin];
@@ -117,10 +114,10 @@ export class CurrencyService {
       currencyRate,
       tftPrice
     }
-  }
+  };
 
   calculateWeightedAverageTFTPrice = async () => {
-    let result = 0
+    let result = 0;
     let volume = 0;
 
     for (const key in this.lastInfo.tftPrice.pairs) {
@@ -142,7 +139,7 @@ export class CurrencyService {
     console.log('WeightedAverage', result, volume);
 
     this.lastInfo.tftPrice.weightedAveragePrice = result / volume;
-  }
+  };
 
   getCurrentTimeStamp= () => Math.floor(new Date().getTime() / 1000);
 

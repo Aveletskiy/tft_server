@@ -1,5 +1,5 @@
-import {CurrencyService} from './../services/currency.service';
-import {CacheService} from './../services/cache.service';
+import {CurrencyService} from '../services/currency.service';
+import {CacheService} from '../services/cache.service';
 
 import * as Currency from './../models/currency';
 
@@ -24,12 +24,18 @@ export class Curency {
   };
 
   async updateTftBtcChartInfo() {
-    const tft_btc = await this.currencyService.getTftBtcRemoteChartInfo();
+    let tft_btc;
 
-    const lastTimeCut = tft_btc[tft_btc.length - 1].time;
     const cachedLastTimeCut = await this.cache.getField(`TFT_BTC_lastUpdate`);
-    if (lastTimeCut !== cachedLastTimeCut) {
-      await this.cache.setField(`TFT_BTC_lastUpdate`, lastTimeCut, 43200);
+    if (cachedLastTimeCut) {
+      tft_btc = await this.currencyService.getTftBtcRemoteChartInfo(cachedLastTimeCut);
+    } else {
+      tft_btc = await this.currencyService.getTftBtcRemoteChartInfo();
+    }
+
+    if (tft_btc.length && tft_btc[tft_btc.length - 1].time !== cachedLastTimeCut) {
+
+      await this.cache.setField(`TFT_BTC_lastUpdate`, tft_btc[tft_btc.length - 1].time);
 
       for (const state of tft_btc){
         const existed = await Currency.findOne({timeStamp: state.time});
