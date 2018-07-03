@@ -14,6 +14,7 @@ export class Tasks {
         this.runUpdateCurrency();
     }
 
+    // cron.scheduler('second minute hour month weekday')
     runTick = () => {
         cron.schedule('*/3 * * * * * *', () => {
             this.tick.sendTickData();
@@ -26,6 +27,7 @@ export class Tasks {
 
     runUpdateCurrency = () => {
         this.currency.updateCurrencyInfo();
+        this.currency.updateTftBtcChartInfo();
 
         cron.schedule('* */3 * * *', () => {
             this.currency.updateCurrencyInfo();
@@ -33,6 +35,11 @@ export class Tasks {
 
         cron.schedule('* * * * *', () => {
             this.currency.updateBtcAlphaInfo();
+        });
+
+        cron.schedule(`* */5 * * *`, () => {
+          console.log(`past ${new Date().getMinutes()}`);
+          this.currency.updateTftBtcChartInfo();
         });
 
         if (process.env.NODE_ENV === 'dev') {

@@ -1,48 +1,56 @@
 const Router = require('koa-router');
-const router = new Router({ prefix: '/api/v1' });
+const router = new Router({prefix: '/api/v1'});
 
-import { Blocks } from './blocks';
-import { Hashes } from './hashes';
-import { Peers } from './peers';
-import { Transactions } from './transactions';
-import { Wallets } from './wallets';
-import { Exchanges } from './exchanges';
+import {Blocks} from './blocks';
+import {Hashes} from './hashes';
+import {Peers} from './peers';
+import {Transactions} from './transactions';
+import {Wallets} from './wallets';
+import {Exchanges} from './exchanges';
+import {Currencies} from './currencies';
 
 const block = new Blocks();
 const hashes = new Hashes();
 const peers = new Peers();
 const transactions = new Transactions();
 const wallets = new Wallets();
-const exchanges = new Exchanges()
+const exchanges = new Exchanges();
+const currencies = new Currencies();
+
 
 router
-    // BLOCKS
-    .get('/', block.getLastInfo)
+  // BLOCKS
+  .get('/', block.getLastInfo)
 
-    .get('/block/:id', block.getByHeight)
-    .get('/block/:id/transactions', block.getBlockTransactions)
-    // -----------------------------------------------
+  .get('/block/:id', block.getByHeight)
+  .get('/block/:id/transactions', block.getBlockTransactions)
+  // -----------------------------------------------
 
-    // TRANSACTIONS
-    .get('/transaction/:hash/:field', transactions.getMoreInfo)
-    // -----------------------------------------------
+  // TRANSACTIONS
+  .get('/transaction/:hash/:field', transactions.getMoreInfo)
+  // -----------------------------------------------
 
-    // WALLET
-    .get('/wallet/:hash/:field', wallets.getMoreInfo)
-    // -----------------------------------------------
+  // WALLET
+  .get('/wallet/:hash/:field', wallets.getMoreInfo)
+  // -----------------------------------------------
 
-    // HASH
-    .get('/hashes/:hash', hashes.findHash)
-    // -----------------------------------------------
+  // CURRENCIES
+  .get('/currency/:since/:until', currencies.getChartDate)
+  .get('/currency', currencies.getChartDate)
+  // -----------------------------------------------
 
-    // PEERS
-    .get('/peers', peers.listPeers)
-    // -----------------------------------------------
+  // HASH
+  .get('/hashes/:hash', hashes.findHash)
+  // -----------------------------------------------
 
-    // EXCHANGES
-    .get('/exchanges/month', exchanges.averageRateByMonth)
-    // -----------------------------------------------
+  // PEERS
+  .get('/peers', peers.listPeers)
+  // -----------------------------------------------
 
-    ;
+  // EXCHANGES
+  .get('/exchanges/month', exchanges.averageRateByMonth)
+// -----------------------------------------------
+
+;
 
 export default router;
