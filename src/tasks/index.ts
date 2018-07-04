@@ -12,7 +12,7 @@ export class Tasks {
   runTasks = () => {
     this.runTick();
     this.runUpdateCurrency();
-  }
+  };
 
   // cron.scheduler('second(optional) minute hour day month weekday')
   runTick = () => {
@@ -24,11 +24,10 @@ export class Tasks {
     if (process.env.NODE_ENV === 'dev') {
       console.log(chalk.white.bgBlue.bold('[tasks] Задача отправки текущих данных запущена'));
     }
-  }
+  };
 
   runUpdateCurrency = () => {
     this.currency.updateCurrencyInfo();
-    this.currency.updateTftBtcChartInfo();
 
     // every 3 minutes
     cron.schedule('* */3 * * * *', () => {
@@ -41,7 +40,7 @@ export class Tasks {
     });
 
     // every 5 minutes
-    cron.schedule('* */5 * * * *', () => {
+    cron.schedule('*/5 * * * *', () => {
       this.currency.updateTftBtcChartInfo();
     });
 

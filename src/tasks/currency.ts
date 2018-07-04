@@ -3,7 +3,8 @@ import {CacheService} from '../services/cache.service';
 
 import * as Currency from './../models/currency';
 
-const chalk = require("chalk");
+const chalk = require('chalk');
+const moment = require('moment')
 
 export class Curency {
   private currencyService;
@@ -26,42 +27,47 @@ export class Curency {
   };
 
   async updateTftBtcChartInfo() {
-    let tft_btc;
+    let timeFrames = {
+      5: null,
+      15: null,
+      30: null,
+      60: null,
+      240: null,
+      D: null,
+    };
 
-    const cachedLastTimeCut = await this.cache.getField(`TFT_BTC_lastUpdate`);
-    if (cachedLastTimeCut) {
-      tft_btc = await this.currencyService.getTftBtcRemoteChartInfo(cachedLastTimeCut);
-    } else {
-      tft_btc = await this.currencyService.getTftBtcRemoteChartInfo();
-    }
+    console.log((` `));
+    for (const prop in timeFrames){
+      if (timeFrames.hasOwnProperty(prop)){
 
-    if (tft_btc.length && tft_btc[tft_btc.length - 1].time !== cachedLastTimeCut) {
+         const lastInFrames = await Currency
+          .find({timeFrame: `${prop}`}, null,{sort: {timeStamp: -1}, limit: 1}).exec();
 
-      await this.cache.setField(`TFT_BTC_lastUpdate`, tft_btc[tft_btc.length - 1].time);
+        const cachedLastTimeCut = lastInFrames.length ? lastInFrames[0].timeStamp : 0;
 
-      for (const state of tft_btc){
-        const existed = await Currency.findOne({timeStamp: state.time});
-        const readyValue = {
-          _id: state.time,
-          value: state.close,
-          volume: state.volume,
-          timeStamp: state.time,
-          updatedAt: Date.now()
-        };
-        if (existed) {
-          await existed.update(
-            readyValue
-          );
-          console.log(chalk.bgMagenta(`CURRENCY:: currency updated ${readyValue}`));
+        timeFrames[prop] = await this.currencyService.getTftBtcRemoteChartInfo(`${prop}`,cachedLastTimeCut+1);
+
+        const timeFrameBatch = timeFrames[prop].map(tick => {
+          return {
+            value: tick.close,
+            volume: tick.volume,
+            timeStamp: tick.time,
+            timeFrame: `${prop}`
+          };
+        });
+
+        if (timeFrameBatch.length){
+          await Currency.collection.insert(timeFrameBatch, (err, docs) => {
+            if(err){
+              console.log(chalk.black.bgRed(err));
+            } else {
+              console.log(chalk.white.bgGreen(`CURRENCY:: new ${docs.insertedCount} ticks in ${prop} frame was saved ${moment().format(`LLL`)}`));
+            }
+          });
         } else {
-          console.log(chalk.bgGreen(`CURRENCY:: currency saved ${readyValue.timeStamp}`));
-          await new Currency(readyValue).save();
+          console.log(chalk.bgCyan(`CURRENCY:: in ${prop} frame nothing to update: ${moment().format(`LLL`)}`));
         }
       }
-    } else {
-      console.log(chalk.bgCyan(`CURRENCY:: nothing to update: ${new Date()}`));
-      console.log(chalk.bgCyan(`CURRENCY:: last chached timeStamp: ${new Date(cachedLastTimeCut)}`));
     }
-
   }
 }

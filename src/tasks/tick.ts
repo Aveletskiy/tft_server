@@ -23,7 +23,7 @@ export class Tick {
 
   sendTickData = async () => {
     const current = await this.tftApi.getCurrentInfo();
-    const BTCAlphaCurrency = await this.currencyService.getTFT_BTCChartInfo();
+    const BTCAlphaCurrency = await this.currencyService.getTFT_BTCAllChartInfo();
 
     if (!current) {
       return;

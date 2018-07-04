@@ -1,16 +1,30 @@
 import {Document, model, Model, Schema} from 'mongoose';
 
+interface ITimeFrames {
+  5: object,
+  15: object,
+  30: object,
+  60: object,
+  240: object,
+  D: object,
+}
+
 interface ICurrency extends Document {
   value: number;
   volume: number;
   timeStamp: number;
-  createdAt: Date;
-  updatedAt: Date;
+  timeFrame: ITimeFrames;
 }
 
 const schema = new Schema({
-  _id: String,
-  timeStamp: Number,
+  timeStamp: {
+    type:Number,
+    index: true
+  },
+  timeFrame: {
+    type: Object,
+    index: true
+  },
   value: Number,
   volume: Number,
   updatedAt: {
@@ -19,8 +33,10 @@ const schema = new Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+
   },
+
   __v: {type: Number, select: false},
 
 });

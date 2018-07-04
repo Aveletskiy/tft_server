@@ -3,6 +3,15 @@ import * as Currency from '../models/currency';
 
 let instance = null;
 
+interface ITimeFrames {
+  5: object,
+  15: object,
+  30: object,
+  60: object,
+  240: object,
+  D: object,
+}
+
 export class CurrencyService {
   private request;
   private parser;
@@ -69,7 +78,6 @@ export class CurrencyService {
               resolve([]);
             }
           }
-          ;
         });
       }) as any;
 
@@ -144,30 +152,40 @@ export class CurrencyService {
   /**
    * Получить текущий упрощенный timeStamp
    */
-  getCurrentTimeStamp= () => Math.floor(new Date().getTime() / 1000);
+  getCurrentTimeStamp = () => Math.floor(new Date().getTime() / 1000);
 
   /**
    * Запросить из btc-alpha.com данные по паре TFT-BTC
+   * @param {string} timeFrame - frames 5, 15, 30, 60, 240, D
    * @param {number} since
    * @param {number} until
    * @returns {Promise<void>}
    */
-  async getTftBtcRemoteChartInfo(since = 1526894938, until = this.getCurrentTimeStamp()) {
+  async getTftBtcRemoteChartInfo(timeFrame = `5`,since = 1514764800, until = this.getCurrentTimeStamp()) {
     try {
-      const chartData = await this.axios.get(`https://btc-alpha.com/api/charts/TFT_BTC/D/chart/?since=${since}&until=${until}`);
+      const chartData = await this.axios.get(`https://btc-alpha.com/api/charts/TFT_BTC/${timeFrame}/chart/?since=${since}&until=${until}`);
       return chartData.data;
     } catch (err) {
       console.log(err);
+      return err.message || err.note;
     }
   }
 
   /**
    * Запросить из базы сохранные данные по паре TFT-BTC
-   * @param {number} since
+   * @param {string} timeFrame - временное окно 5, 15, 30, 60, 240, D
+   * @param {number} since - default 01.01.2018 00:00 GMT
    * @param {number} until
    */
-  getTFT_BTCChartInfo(since = 1526894938, until = this.getCurrentTimeStamp()) {
-    return Currency.find({timeStamp: {$gte: since, $lte: until}});
+  getTFT_BTCChartInfo(timeFrame = `5`, since = 1514764800, until = this.getCurrentTimeStamp()) {
+    return Currency.find({timeStamp: {$gte: since, $lte: until}, timeFrame: timeFrame.toLocaleUpperCase()}, '-_id value timeFrame timeStamp', {sort: {timeStamp: 1}});
+  }
+
+  /**
+   * Запросить из базы сохранные данные по паре TFT-BTC по timeFrame 15 минут
+   */
+  getTFT_BTCAllChartInfo() {
+    return Currency.find({timeFrame: `15`}, '-_id value timeFrame timeStamp');
   }
 
   async getBtcAlphaPrice (pair: String) {

@@ -8,6 +8,7 @@ import {Transactions} from './transactions';
 import {Wallets} from './wallets';
 import {Exchanges} from './exchanges';
 import {Currencies} from './currencies';
+import {Charts} from './charts';
 
 const block = new Blocks();
 const hashes = new Hashes();
@@ -16,6 +17,7 @@ const transactions = new Transactions();
 const wallets = new Wallets();
 const exchanges = new Exchanges();
 const currencies = new Currencies();
+const charts = new Charts();
 
 
 router
@@ -35,9 +37,17 @@ router
   // -----------------------------------------------
 
   // CURRENCIES
-  .get('/currency/:since/:until', currencies.getChartDate)
-  .get('/currency/:since', currencies.getChartDate)
-  .get('/currency', currencies.getChartDate)
+  .get('/currency/:frame/:since/:until', currencies.getChartData)
+  .get('/currency/:frame/:since', currencies.getChartData)
+  .get('/currency/:frame', currencies.getChartData)
+  .get('/currency', currencies.getAllChartData)
+  // -----------------------------------------------
+
+  // CHARTS
+  .get('/chart/currency/:frame/:since/:until', charts.getCurrencyChartData)
+  .get('/chart/currency/:frame/:since', charts.getCurrencyChartData)
+  .get('/chart/currency/:frame', charts.getCurrencyChartData)
+  .get('/chart/currency', charts.getCurrencyAllChartData)
   // -----------------------------------------------
 
   // HASH
