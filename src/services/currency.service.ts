@@ -141,10 +141,13 @@ export class CurrencyService {
     this.lastInfo.tftPrice.weightedAveragePrice = result / volume;
   };
 
+  /**
+   * Получить текущий упрощенный timeStamp
+   */
   getCurrentTimeStamp= () => Math.floor(new Date().getTime() / 1000);
 
   /**
-   *
+   * Запросить из btc-alpha.com данные по паре TFT-BTC
    * @param {number} since
    * @param {number} until
    * @returns {Promise<void>}
@@ -158,6 +161,11 @@ export class CurrencyService {
     }
   }
 
+  /**
+   * Запросить из базы сохранные данные по паре TFT-BTC
+   * @param {number} since
+   * @param {number} until
+   */
   getTFT_BTCChartInfo(since = 1526894938, until = this.getCurrentTimeStamp()) {
     return Currency.find({timeStamp: {$gte: since, $lte: until}});
   }

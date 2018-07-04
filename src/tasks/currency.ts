@@ -3,6 +3,8 @@ import {CacheService} from '../services/cache.service';
 
 import * as Currency from './../models/currency';
 
+const chalk = require("chalk");
+
 export class Curency {
   private currencyService;
   private cache;
@@ -50,14 +52,15 @@ export class Curency {
           await existed.update(
             readyValue
           );
-          console.log(`CURRENCY:: currency updated ${readyValue}`);
+          console.log(chalk.bgMagenta(`CURRENCY:: currency updated ${readyValue}`));
         } else {
-          console.log(`CURRENCY:: currency saved ${readyValue.timeStamp}`);
+          console.log(chalk.bgGreen(`CURRENCY:: currency saved ${readyValue.timeStamp}`));
           await new Currency(readyValue).save();
         }
       }
     } else {
-      console.log(`CURRENCY:: nothing to update`);
+      console.log(chalk.bgCyan(`CURRENCY:: nothing to update: ${new Date()}`));
+      console.log(chalk.bgCyan(`CURRENCY:: last chached timeStamp: ${new Date(cachedLastTimeCut)}`));
     }
 
   }

@@ -36,6 +36,7 @@ router
 
   // CURRENCIES
   .get('/currency/:since/:until', currencies.getChartDate)
+  .get('/currency/:since', currencies.getChartDate)
   .get('/currency', currencies.getChartDate)
   // -----------------------------------------------
 
