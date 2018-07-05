@@ -9,6 +9,13 @@ export class Tasks {
   private tick = new Tick();
   private currency = new Curency();
 
+  /**
+   * use full delay util
+   * @param ms
+   * @example async () => await delay(1000); // delay 1 second
+   */
+  delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
   runTasks = () => {
     this.runFetchBtcAlphaData();
     this.runTick();

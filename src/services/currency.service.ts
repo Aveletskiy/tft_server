@@ -167,6 +167,8 @@ export class CurrencyService {
    * @returns {Promise<void>}
    */
   async fillDataBaseByTftBtcQuotation(timeFrame,until=this.getCurrentTimeStamp(), total=0) {
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+    await delay(500);
     const timeFrameData = await this.getTftBtcRemoteChartInfo(timeFrame,0, until);
     if (timeFrameData && timeFrameData.length > 2) {
       const timeFrameBatch = await timeFrameData.map(tick => {
