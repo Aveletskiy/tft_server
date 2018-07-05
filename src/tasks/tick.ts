@@ -38,12 +38,6 @@ export class Tick {
     }, 0);
 
     try {
-      let TFT_BTC = await this.cache.getField(`TFT_BTC`);
-      if (!TFT_BTC) {
-        await this.currencyTask.updateCachedTftBtcChartInfo();
-        TFT_BTC = await this.cache.getField(`TFT_BTC`);
-      }
-
       let totalSupply = await this.cache.getField(`totalSupply`);
       if (totalSupply && totalSupply.height < current.height) {
         const value = totalSupply.value + minerReward;
@@ -77,8 +71,6 @@ export class Tick {
           tftPrice
         },
         totalSupply: totalSupply.value,
-        TFT_BTC: TFT_BTC,
-        TFT_BTCLength: TFT_BTC.length
       };
 
       this.socketService.sendTick(tickData);

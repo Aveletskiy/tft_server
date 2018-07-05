@@ -35,6 +35,7 @@ export class Curency {
   };
 
   /**
+   * @deprecated
    * обновляет кеш redis данными по паре TFT_BTC
    * @returns {Promise<object>}
    */
@@ -83,7 +84,6 @@ export class Curency {
 
           timeFrames[prop] = await this.currencyService.getTftBtcRemoteChartInfo(`${prop}`,cachedLastTimeCut/1000+1);
 
-          debugger;
           if (timeFrames[prop] && timeFrames[prop].length) {
             const timeFrameBatch = await timeFrames[prop].map(tick => {
               return {

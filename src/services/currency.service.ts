@@ -159,6 +159,13 @@ export class CurrencyService {
 
   getUnixTimeStamp = (timeStamp) => Math.floor(timeStamp / 1000);
 
+  /**
+   * Рекурентная функция по сбору данных с BTC-ALPHA
+   * @param timeFrame
+   * @param {number} until
+   * @param {number} total
+   * @returns {Promise<void>}
+   */
   async fillDataBaseByTftBtcQuotation(timeFrame,until=this.getCurrentTimeStamp(), total=0) {
     const timeFrameData = await this.getTftBtcRemoteChartInfo(timeFrame,0, until);
     if (timeFrameData && timeFrameData.length > 2) {
@@ -176,7 +183,7 @@ export class CurrencyService {
         if (err) {
           console.log(chalk.black.bgRed(err));
         } else {
-          console.log(chalk.white.bgGreen(`CURRENCY:: new ${docs.insertedCount} ticks in ${timeFrame} frame was saved ${moment().format(`LLL`)}`));
+          console.log(chalk.cyan.bgGreen(`CURRENCY:: new ${docs.insertedCount} ticks in ${timeFrame} frame was saved ${moment().format(`LLL`)}`));
         }
       });
 
@@ -195,8 +202,8 @@ export class CurrencyService {
    * Запросить из btc-alpha.com данные по паре TFT-BTC
    * не более 720 записей за раз
    * @param {string} timeFrame - frames 5, 15, 30, 60, 240, D
-   * @param {number} since
-   * @param {number} until
+   * @param {number} since - default 01.01.2018 00:00 GMT UNIX
+   * @param {number} until - UNIX timestamp
    * @returns {Promise<void>}
    */
   async getTftBtcRemoteChartInfo(timeFrame = `5`,since = 1514764800, until = this.getCurrentTimeStamp()) {
@@ -204,7 +211,6 @@ export class CurrencyService {
       const chartData = await this.axios.get(`https://btc-alpha.com/api/charts/TFT_BTC/${timeFrame}/chart/?since=${since}&until=${until}`);
       return chartData.data;
     } catch (err) {
-      debugger;
       console.log(chalk.red(err.request.path));
       console.log(chalk.red(err.message));
 
@@ -215,11 +221,11 @@ export class CurrencyService {
   /**
    * Запросить из базы сохранные данные по паре TFT-BTC
    * @param {string} timeFrame - временное окно 5, 15, 30, 60, 240, D
-   * @param {number} since - default 01.01.2018 00:00 GMT
-   * @param {number} until
+   * @param {number} since - standard timestamp
+   * @param {number} until - standard timestamp
    */
-  getTFT_BTCChartInfo(timeFrame = `5`, since = 1514764800, until = this.getCurrentTimeStamp()) {
-    return Currency.find({timeStamp: {$gte: since, $lte: until}, timeFrame: timeFrame.toLocaleUpperCase()}, '-_id value timeFrame timeStamp', {sort: {timeStamp: 1}});
+  getTFT_BTCChartInfo(timeFrame = `5`, since = 0, until = Date.now()) {
+    return Currency.find({timeStamp: {$gte: since, $lte: until}, timeFrame: timeFrame.toUpperCase()}, '-_id value timeFrame timeStamp', {sort: {timeStamp: 1}});
   }
 
   /**
