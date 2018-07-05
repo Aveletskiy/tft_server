@@ -36,6 +36,7 @@ export class Curency {
     for (const elem of BTCAlphaCurrency) {
       TFT_BTC.push([elem.timeStamp, elem.value])
     }
+    console.log(chalk.blue.bgYellow(`TFT_BTC redis update ${moment().format('LLL')}`));
     return this.cache.setField('TFT_BTC', TFT_BTC);
   }
 

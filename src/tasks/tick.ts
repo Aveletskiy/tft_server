@@ -60,7 +60,7 @@ export class Tick {
         };
       }
 
-      this.socketService.sendTick({
+      const tickData = {
         lastBlock: {
           _id: current.blockid,
           height: current.height,
@@ -77,8 +77,12 @@ export class Tick {
           tftPrice
         },
         totalSupply: totalSupply.value,
-        TFT_BTC: TFT_BTC
-      });
+        TFT_BTC: TFT_BTC,
+        TFT_BTCLength: TFT_BTC.length
+      };
+      console.log(`TFT_BTCLength: ${tickData.TFT_BTCLength}`);
+
+      this.socketService.sendTick(tickData);
 
       if (this.syncedBlock !== current.height) {
         this.syncBlockService.syncBlockByHeight(current.height);
