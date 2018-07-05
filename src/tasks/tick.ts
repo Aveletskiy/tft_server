@@ -80,7 +80,6 @@ export class Tick {
         TFT_BTC: TFT_BTC,
         TFT_BTCLength: TFT_BTC.length
       };
-      console.log(`TFT_BTCLength: ${tickData.TFT_BTCLength}`);
 
       this.socketService.sendTick(tickData);
 
