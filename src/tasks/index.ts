@@ -10,6 +10,7 @@ export class Tasks {
   private currency = new Curency();
 
   runTasks = () => {
+    this.runFetchBtcAlphaData();
     this.runTick();
     this.runUpdateCurrency();
   };
@@ -24,6 +25,10 @@ export class Tasks {
     if (process.env.NODE_ENV === 'dev') {
       console.log(chalk.white.bgBlue.bold('[tasks] Задача отправки текущих данных запущена'));
     }
+  };
+
+  runFetchBtcAlphaData = () => {
+    this.currency.fillTFT_BTCQuotation();
   };
 
   runUpdateCurrency = () => {

@@ -1,6 +1,9 @@
 import * as Exchange from '../models/exchange';
 import * as Currency from '../models/currency';
 
+const chalk = require('chalk');
+const moment = require('moment');
+
 let instance = null;
 
 interface ITimeFrames {
@@ -154,8 +157,43 @@ export class CurrencyService {
    */
   getCurrentTimeStamp = () => Math.floor(new Date().getTime() / 1000);
 
+  getUnixTimeStamp = (timeStamp) => Math.floor(timeStamp / 1000);
+
+  async fillDataBaseByTftBtcQuotation(timeFrame,until=this.getCurrentTimeStamp(), total=0) {
+    const timeFrameData = await this.getTftBtcRemoteChartInfo(timeFrame,0, until);
+    if (timeFrameData && timeFrameData.length > 2) {
+      const timeFrameBatch = await timeFrameData.map(tick => {
+        return {
+          value: tick.close,
+          volume: tick.volume,
+          timeStamp: tick.time * 1000,
+          timeFrame: `${timeFrame}`
+        };
+      });
+      const lastFrameTime = this.getUnixTimeStamp(timeFrameBatch[timeFrameBatch.length-1].timeStamp);
+
+      await Currency.collection.insert(timeFrameBatch, (err, docs) => {
+        if (err) {
+          console.log(chalk.black.bgRed(err));
+        } else {
+          console.log(chalk.white.bgGreen(`CURRENCY:: new ${docs.insertedCount} ticks in ${timeFrame} frame was saved ${moment().format(`LLL`)}`));
+        }
+      });
+
+      total+=timeFrameBatch.length;
+      console.log(chalk.yellow(`count ${timeFrameBatch.length}`));
+      console.log(chalk.yellow(`batch ${new Date(lastFrameTime*1000)}`));
+
+      await this.fillDataBaseByTftBtcQuotation(timeFrame, lastFrameTime, total)
+    } else {
+      console.log(chalk.cyan(`total ${total}`));
+      return;
+    }
+  }
+
   /**
    * Запросить из btc-alpha.com данные по паре TFT-BTC
+   * не более 720 записей за раз
    * @param {string} timeFrame - frames 5, 15, 30, 60, 240, D
    * @param {number} since
    * @param {number} until
@@ -166,8 +204,11 @@ export class CurrencyService {
       const chartData = await this.axios.get(`https://btc-alpha.com/api/charts/TFT_BTC/${timeFrame}/chart/?since=${since}&until=${until}`);
       return chartData.data;
     } catch (err) {
-      console.log(err);
-      return err.message || err.note;
+      debugger;
+      console.log(chalk.red(err.request.path));
+      console.log(chalk.red(err.message));
+
+      return null;
     }
   }
 
@@ -185,7 +226,7 @@ export class CurrencyService {
    * Запросить из базы сохранные данные по паре TFT-BTC по timeFrame 15 минут
    */
   getTFT_BTCAllChartInfo() {
-    return Currency.find({timeFrame: `15`}, '-_id value timeFrame timeStamp');
+    return Currency.find({}, '-_id value timeFrame timeStamp');
   }
 
   async getBtcAlphaPrice (pair: String) {
