@@ -1,8 +1,10 @@
-import {CurrencyService} from './../services/currency.service';
+import {CurrencyService} from '../services/currency.service';
 import {TftApiService} from '../services/tftAPI.service'
 import {SocketServer} from '../services/socket.service';
 import {SyncBlockService} from '../services/syncBlocks.service';
 import {CacheService} from '../services/cache.service';
+
+import {Curency} from './currency'
 
 export class Tick {
   private socketService;
@@ -11,6 +13,7 @@ export class Tick {
   private syncedBlock;
   private syncBlockService;
   private cache;
+  private currencyTask;
 
   constructor() {
     this.socketService = new SocketServer();
@@ -18,16 +21,12 @@ export class Tick {
     this.currencyService = new CurrencyService;
     this.syncBlockService = new SyncBlockService();
     this.cache = new CacheService();
+    this.currencyTask = new Curency();
     this.syncedBlock = 0;
   }
 
   sendTickData = async () => {
     const current = await this.tftApi.getCurrentInfo();
-    const BTCAlphaCurrency = await this.currencyService.getTFT_BTCAllChartInfo();
-    let TFT_BTC = [];
-    for (const elem of BTCAlphaCurrency) {
-      TFT_BTC.push([elem.timeStamp, elem.value])
-    }
 
     if (!current) {
       return;
@@ -39,6 +38,12 @@ export class Tick {
     }, 0);
 
     try {
+      let TFT_BTC = await this.cache.getField(`TFT_BTC`);
+      if (!TFT_BTC) {
+        await this.currencyTask.updateCachedTftBtcChartInfo();
+        TFT_BTC = await this.cache.getField(`TFT_BTC`);
+      }
+
       let totalSupply = await this.cache.getField(`totalSupply`);
       if (totalSupply && totalSupply.height < current.height) {
         const value = totalSupply.value + minerReward;

@@ -4,7 +4,7 @@ import {CacheService} from '../services/cache.service';
 import * as Currency from './../models/currency';
 
 const chalk = require('chalk');
-const moment = require('moment')
+const moment = require('moment');
 
 export class Curency {
   private currencyService;
@@ -25,6 +25,19 @@ export class Curency {
     await this.currencyService.getBtcAlphaPrice('TFT_USD');
     this.currencyService.calculateWeightedAverageTFTPrice();
   };
+
+  /**
+   * обновляет кеш redis данными по паре TFT_BTC
+   * @returns {Promise<object>}
+   */
+  async updateCachedTftBtcChartInfo(){
+    const BTCAlphaCurrency = await this.currencyService.getTFT_BTCAllChartInfo();
+    let TFT_BTC = [];
+    for (const elem of BTCAlphaCurrency) {
+      TFT_BTC.push([elem.timeStamp, elem.value])
+    }
+    return this.cache.setField('TFT_BTC', TFT_BTC);
+  }
 
   async updateTftBtcChartInfo() {
     let timeFrames = {

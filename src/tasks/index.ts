@@ -44,9 +44,14 @@ export class Tasks {
       this.currency.updateTftBtcChartInfo();
     });
 
+    cron.schedule('*/15 * * * *', async () => {
+      await this.currency.updateCachedTftBtcChartInfo();
+    });
+
     if (process.env.NODE_ENV === 'dev') {
       console.log(chalk.white.bgBlue.bold('[tasks] Задача обновления курсов запущена'));
     }
     console.log(chalk.white.bgBlue.bold('[tasks] Задача обновления курсов запущена'));
   }
-};
+
+}
