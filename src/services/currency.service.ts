@@ -160,7 +160,7 @@ export class CurrencyService {
   getUnixTimeStamp = (timeStamp) => Math.floor(timeStamp / 1000);
 
   /**
-   * Рекурентная функция по сбору данных с BTC-ALPHA
+   * Рекуррентная функция по сбору данных с BTC-ALPHA
    * @param timeFrame
    * @param {number} until
    * @param {number} total

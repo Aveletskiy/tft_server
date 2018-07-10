@@ -55,7 +55,8 @@ router
   // -----------------------------------------------
 
   // PEERS
-  .get('/peers', peers.listPeers)
+  .get('/peers', peers.getNodesList)
+  .get('/peers/stat', peers.getNodesStatistic)
   // -----------------------------------------------
 
   // EXCHANGES

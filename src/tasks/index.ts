@@ -3,23 +3,19 @@ import * as chalk from 'chalk';
 
 import {Tick} from './tick';
 import {Curency} from './currency';
+import {Nodes} from './nodes';
 
 
 export class Tasks {
   private tick = new Tick();
   private currency = new Curency();
-
-  /**
-   * use full delay util
-   * @param ms
-   * @example async () => await delay(1000); // delay 1 second
-   */
-  delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+  private nodes = new Nodes();
 
   runTasks = () => {
-    this.runFetchBtcAlphaData();
+    // this.runFetchBtcAlphaData();
     this.runTick();
-    this.runUpdateCurrency();
+    // this.runUpdateCurrency();
+    this.runFetchCapacity();
   };
 
   // cron.scheduler('second(optional) minute hour day month weekday')
@@ -36,6 +32,12 @@ export class Tasks {
 
   runFetchBtcAlphaData = () => {
     this.currency.fillTFT_BTCQuotation();
+  };
+
+  runFetchCapacity = () => {
+    cron.schedule('*/15 * * * *', () => {
+      this.nodes.fetchRemoteData();
+    });
   };
 
   runUpdateCurrency = () => {

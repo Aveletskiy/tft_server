@@ -18,6 +18,7 @@ interface IUnit extends Document {
   computeUnitPriceUSD: number,
   storageUnitPriceUSD: number,
   maxSupply: number,
+  annualNetworkRevenue: number,
 
   computeUnitPrice: ISeries,
   storageUnitPrice: ISeries,
@@ -64,6 +65,11 @@ const schema = new Schema({
   maxSupply: {
     type: Number,
     default: 100000000000
+  },
+
+  annualNetworkRevenue: {
+    type: Number,
+    default: 0
   },
 
   computeUnitPrice: {
