@@ -4,7 +4,7 @@ import {CacheService} from '../../services/cache.service';
 
 import * as Block from '../../models/block';
 import * as Transaction from '../../models/transaction';
-import * as Unit from '../../models/unit';
+import {Unit} from '../../models/unit';
 
 
 export class Blocks {

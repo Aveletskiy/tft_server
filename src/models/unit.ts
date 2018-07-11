@@ -34,42 +34,34 @@ const schema = new Schema({
 
   computeUnitsTotal: {
     type: Number,
-    default: 25200
   },
 
   storageUnitsTotal: {
     type: Number,
-    default: 91578
   },
 
   storageUnitsTB: {
     type: Number,
-    default: 73000
   },
 
   storageUnitsCores: {
     type: Number,
-    default: 28000
   },
 
   computeUnitPriceUSD: {
     type: Number,
-    default: 12
   },
 
   storageUnitPriceUSD: {
     type: Number,
-    default: 10
   },
 
   maxSupply: {
     type: Number,
-    default: 100000000000
   },
 
   annualNetworkRevenue: {
     type: Number,
-    default: 0
   },
 
   computeUnitPrice: {
@@ -103,4 +95,4 @@ const schema = new Schema({
 
 const Unit = model<IUnit>('Unit', schema);
 
-export = Unit;
+export {Unit};
