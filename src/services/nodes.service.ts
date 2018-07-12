@@ -53,12 +53,14 @@ export class NodesService {
       });
       let counted = countedInfo.reduce((acc, curr) => acc + curr.geo.count, 0);
       if (counted === remoteData.length) {
-        Node.collection.insert(countedInfo, (err, docs) => {
-          if (err) {
-            console.log(chalk.black.bgRed(err));
-          } else {
-            console.log(chalk.cyan.bgGreen(`NODES:: ${docs.insertedCount} alocated nodes was updated ${moment().format(`LLL`)}`));
-          }
+        Node.remove({}, (err, docs) => {
+          Node.collection.insert(countedInfo, (err, docs) => {
+            if (err) {
+              console.log(chalk.black.bgRed(err));
+            } else {
+              console.log(chalk.cyan.bgGreen(`NODES:: ${docs.insertedCount} alocated nodes was updated ${moment().format(`LLL`)}`));
+            }
+          });
         });
       }
     } catch (err) {
@@ -102,7 +104,7 @@ export class NodesService {
         storageUnitsTotal: storageUnitsTotal,
         storageUnitsTB: unitsSum.sru + unitsSum.hru,
         storageUnitsCores: unitsSum.cru,
-        annualNetworkRevenue: unitsSum.cru * existData.computeUnitPriceUSD + storageUnitsTotal * existData.storageUnitPriceUSD
+        annualNetworkRevenue: 12 * (unitsSum.cru * existData.computeUnitPriceUSD + storageUnitsTotal * existData.storageUnitPriceUSD)
       },(err, docs) => {
         if (err) {
           console.log(chalk.black.bgRed(err));
