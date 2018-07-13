@@ -64,6 +64,10 @@ const schema = new Schema({
     type: Number,
   },
 
+  fiveYearsNetworkRevenue: {
+    type: Number,
+  },
+
   computeUnitPrice: {
     name: {
       type: String,

@@ -5,8 +5,6 @@ const chalk = require('chalk');
 const moment = require('moment');
 const axios = require(`axios`);
 
-let instance = null;
-
 export class NodesService {
   constructor() {
   }
@@ -102,9 +100,10 @@ export class NodesService {
       Unit.update({
         computeUnitsTotal: unitsSum.cru,
         storageUnitsTotal: storageUnitsTotal,
-        storageUnitsTB: unitsSum.sru + unitsSum.hru,
+        storageUnitsTB: (unitsSum.sru + unitsSum.hru) / 1024,
         storageUnitsCores: unitsSum.cru,
-        annualNetworkRevenue: 12 * (unitsSum.cru * existData.computeUnitPriceUSD + storageUnitsTotal * existData.storageUnitPriceUSD)
+        annualNetworkRevenue: 12 * (unitsSum.cru * existData.computeUnitPriceUSD + storageUnitsTotal * existData.storageUnitPriceUSD),
+        fiveYearsNetworkRevenue: 60 * (unitsSum.cru * existData.computeUnitPriceUSD + storageUnitsTotal * existData.storageUnitPriceUSD),
       },(err, docs) => {
         if (err) {
           console.log(chalk.black.bgRed(err));

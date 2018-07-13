@@ -12,9 +12,9 @@ export class Tasks {
   private nodes = new Nodes();
 
   runTasks = () => {
-    // this.runFetchBtcAlphaData();
+    this.runFetchBtcAlphaData();
     this.runTick();
-    // this.runUpdateCurrency();
+    this.runUpdateCurrency();
     this.runFetchCapacity();
   };
 
@@ -26,7 +26,7 @@ export class Tasks {
     });
 
     if (process.env.NODE_ENV === 'dev') {
-      console.log(chalk.white.bgBlue.bold('[tasks] Задача отправки текущих данных запущена'));
+      console.log(chalk.white.bgBlue.bold('[tasks] Socket update task is running'));
     }
   };
 
@@ -36,7 +36,7 @@ export class Tasks {
 
   runFetchCapacity = () => {
     // every 12 minutes
-    cron.schedule('* */12 * * *', () => {
+    cron.schedule('*/12 * * * * *', () => {
       this.nodes.fetchRemoteData();
     });
   };
@@ -60,9 +60,8 @@ export class Tasks {
     });
 
     if (process.env.NODE_ENV === 'dev') {
-      console.log(chalk.white.bgBlue.bold('[tasks] Задача обновления курсов запущена'));
+      console.log(chalk.white.bgBlue.bold('[tasks] Currency update task is running'));
     }
-    console.log(chalk.white.bgBlue.bold('[tasks] Задача обновления курсов запущена'));
   }
 
 }
