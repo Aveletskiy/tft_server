@@ -46,13 +46,6 @@ export class Blocks {
 
     const {coinPrice, currencyRate, tftPrice} = await this.currencyService.getLastInfo('BTC', 'USD', ['TFT_BTC', 'TFT_USD']);
 
-    let UnitInfo = await Unit.findOne({});
-    if (!UnitInfo) {
-      const unit = new Unit({_id: "1"});
-      await unit.save();
-      UnitInfo = await Unit.findOne({});
-    }
-
     ctx.body = {
       result: true,
       data: {
@@ -70,18 +63,9 @@ export class Blocks {
           tftPrice,
         },
         totalSupply: totalSupply.value,
-        computeUnitsTotal: UnitInfo.computeUnitsTotal,
-        storageUnitsTotal: UnitInfo.storageUnitsTotal,
-        storageUnitsTB: UnitInfo.storageUnitsTB,
-        storageUnitsCores: UnitInfo.storageUnitsCores,
-        computeUnitPriceUSD: UnitInfo.computeUnitPriceUSD,
-        storageUnitPriceUSD: UnitInfo.storageUnitPriceUSD,
-        maxSupply: UnitInfo.maxSupply,
-        computeUnitPrice: UnitInfo.computeUnitPrice,
-        storageUnitPrice: UnitInfo.storageUnitPrice,
       }
     }
-  }
+  };
 
   getBlockTransactions = async (ctx) => {
     const id = Number.parseInt(decodeURIComponent(ctx.params.id));

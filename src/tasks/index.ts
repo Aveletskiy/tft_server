@@ -36,7 +36,7 @@ export class Tasks {
 
   runFetchCapacity = () => {
     // every 12 minutes
-    cron.schedule('*/12 * * * * *', () => {
+    cron.schedule('* */12 * * *', () => {
       this.nodes.fetchRemoteData();
     });
   };
