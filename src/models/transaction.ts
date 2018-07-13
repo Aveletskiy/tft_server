@@ -30,7 +30,7 @@ interface ITransaction extends Document {
     parentId: string;
     blockStakeInputs: IInputs;
     blockStakeOutputs: IOutputs;
-    сoinInput: IInputs;
+    coinInput: IInputs;
     coinOutput: IOutputs;
     coinInputCount: number;
     coinOutputCount: number;
@@ -93,11 +93,11 @@ const schema = new Schema({
         value: Number,
         lockTime: Number,
     }],
-    
+
     minerFees: [],
 
     rates: {},
-        
+
     createdAt: {
         type: Date,
         default: Date.now

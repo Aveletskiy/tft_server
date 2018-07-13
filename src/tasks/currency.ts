@@ -24,8 +24,8 @@ export class Curency {
   }
 
   updateCurrencyInfo = async () => {
-    const coinPrice = await this.currencyService.getCoinPrice('BTC');
-    const euroRate = await this.currencyService.getEuroRate('USD');
+    await this.currencyService.getCoinPrice('BTC');
+    await this.currencyService.getEuroRate('USD');
   };
 
   updateBtcAlphaInfo = async () => {
@@ -33,21 +33,6 @@ export class Curency {
     await this.currencyService.getBtcAlphaPrice('TFT_USD');
     this.currencyService.calculateWeightedAverageTFTPrice();
   };
-
-  /**
-   * @deprecated
-   * обновляет кеш redis данными по паре TFT_BTC
-   * @returns {Promise<object>}
-   */
-  async updateCachedTftBtcChartInfo(){
-    const BTCAlphaCurrency = await this.currencyService.getTFT_BTCChartInfo(`15`);
-    let TFT_BTC = [];
-    for (const elem of BTCAlphaCurrency) {
-      TFT_BTC.push([elem.timeStamp, elem.value])
-    }
-    console.log(chalk.blue.bgYellow(`TFT_BTC redis update ${moment().format('LLL')}`));
-    return this.cache.setField('TFT_BTC', TFT_BTC);
-  }
 
   async fillTFT_BTCQuotation(){
     await Currency.remove({});
