@@ -15,7 +15,7 @@ export class Tasks {
     this.runFetchBtcAlphaData();
     this.runTick();
     this.runUpdateCurrency();
-    this.runFetchCapacity();
+    // this.runFetchCapacity(); todo w8 for ready remote API
   };
 
   // cron.scheduler('second(optional) minute hour day month weekday')
@@ -35,7 +35,7 @@ export class Tasks {
   };
 
   runFetchCapacity = () => {
-    // every 12 minutes
+    // every 12 hours
     cron.schedule('* */12 * * *', () => {
       this.nodes.fetchRemoteData();
     });
